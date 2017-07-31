@@ -14,7 +14,14 @@ from .Client import Client
 from .Guesser import Guesser
 
 class Dialogue():
-    def __init__(self, data_file, server_address, ambiguity_threshold=0.9):
+    def __init__(self, args):
+        self.ambiguity_threshold = 0.9
+        server_address = "localhost"
+        if args["--host"]:
+            server_address = args["--host"]
+        if args["--ambigthresh"]:
+            self.ambiguity_threshold = int(args["--ambigthresh"])
+            
         # Create a pipe to communicate to the client process
         self.pipe_in_client, self.pipe_out_dia = os.pipe()
         self.pipe_in_dia, self.pipe_out_client = os.pipe()
@@ -26,10 +33,9 @@ class Dialogue():
         self.client.start()
 
         # Create a guesser object that ranks the options and estimates ambiguity.
-        self.guesser = Guesser(data_file, guess_type="tfidf")
+        self.guesser = Guesser(args["data_file"], guess_type="tfidf")
 
         self.state = "initial"
-        self.ambiguity_threshold = ambiguity_threshold
 
     def run(self):
         """ Main loop of the dialouge client. It works much like a chat client.

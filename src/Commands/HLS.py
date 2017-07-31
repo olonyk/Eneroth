@@ -13,11 +13,13 @@ import re
 class Server:
     """ A simple TCP server.
     """
-    def __init__(self):
+    def __init__(self, args):
         # Set log behaviour
-        self.do_print = True
-        self.do_log = True
-        self.log_file = "log_txt.txt"
+        if args["-l"]:
+            self.do_log = True
+            self.log_file = "log_txt.txt"
+        if args["-v"]:
+            self.do_print = True
 
         # List to keep track of socket descriptors
         self.connection_dict = {}

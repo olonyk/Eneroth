@@ -1,31 +1,36 @@
 """Usage:
-    Eneroth.py Server
-    Eneroth.py DummySender [-vh] [--host=HOST] [--nrobj=NROBJ] [--delay=DELAY]
+    Eneroth.py Server [-vlth]
+    Eneroth.py Dialogue [-th] (--data_file=DB) [--host=HOST] [--ambigthresh=AMBIGTHRESH]
+    Eneroth.py DummySender [-vth] [--host=HOST] [--nrobj=NROBJ] [--delay=DELAY]
 
-arguments_example.py [-vqrh] [FILE] ...
-          arguments_example.py 
-Process FILE and optionally apply correction to either left-hand side or
-right-hand side.
-Arguments:
-  FILE        optional input file
-  CORRECTION  correction angle, needs FILE, --left or --right to be present
 Options:
-  -h --help
+  -h       help
   -v       verbose mode
-  -q       quiet mode
-  -r       make report
-  --left   use left-hand side
-  --right  use right-hand side
+  -t       time execution
+  -l       log
 """
 
 from docopt import docopt
+from datetime import datetime
 from Commands.DummySender import Dummy
+from Commands.HLS import Server
+from Commands.Dialogue import Dialogue
 
 if __name__ == '__main__':
   args = docopt(__doc__)
   print(args)
   command = None
-  if args["DummySender"]:
+  if args["-h"]:
+    print(__doc__)
+  elif args["DummySender"]:
     command = Dummy(args)
-  
-  command.run()
+  elif args["Server"]:
+    command = Server(args)
+  elif args["Dialogue"]:
+    command = Dialogue(args)
+  if command:
+    if args["-t"]:
+      startTime = datetime.now()
+    command.run()
+    if args["-t"]:
+      print("Execution time:\t{}".format(datetime.now() - startTime))
