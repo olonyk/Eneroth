@@ -9,6 +9,8 @@ import sys
 import select
 import time
 import socket
+import signal
+import traceback, threading
 
 from .Client import Client
 from .Guesser import Guesser
@@ -21,7 +23,7 @@ class Dialogue():
             server_address = args["--host"]
         if args["--ambigthresh"]:
             self.ambiguity_threshold = int(args["--ambigthresh"])
-            
+
         # Create a pipe to communicate to the client process
         self.pipe_in_client, self.pipe_out_dia = os.pipe()
         self.pipe_in_dia, self.pipe_out_client = os.pipe()
@@ -33,35 +35,41 @@ class Dialogue():
         self.client.start()
 
         # Create a guesser object that ranks the options and estimates ambiguity.
-        self.guesser = Guesser(args["data_file"], guess_type="tfidf")
+        self.guesser = Guesser(args["--data_file"], guess_type="tfidf")
 
         self.state = "initial"
 
     def run(self):
         """ Main loop of the dialouge client. It works much like a chat client.
         """
-        while True:
-            # Wait for either incomming message from the server (via the client) or from the user
-            # via the command line
-            socket_list = [self.pipe_in_dia]
+        try:
+            while True:
+                # Wait for either incomming message from the server (via the client) or from the user
+                # via the command line
+                socket_list = [self.pipe_in_dia]
 
-            # Get the list sockets which are readable
-            read_sockets, _, _ = select.select(socket_list, [], [])
+                # Get the list sockets which are readable
+                read_sockets, _, _ = select.select(socket_list, [], [])
 
-            for sock in read_sockets:
-                # Incoming message from remote server
-                if sock == self.pipe_in_dia:
-                    data = os.read(self.pipe_in_dia, 32).decode("utf-8")
-                    if not data:
-                        print('\nDisconnected from server')
-                        sys.exit()
-                    else:
-                        #print data
-                        self.interpret(data)
+                for sock in read_sockets:
+                    # Incoming message from remote server
+                    if sock == self.pipe_in_dia:
+                        data = os.read(self.pipe_in_dia, 32).decode("utf-8")
+                        if not data:
+                            raise SystemExit("Disconnected from server")
+                        else:
+                            #print data
+                            self.interpret(data)
+        except (KeyboardInterrupt, SystemExit):
+            pass
+        finally:
+            self.secure_close()
 
     def interpret(self, data):
         """ Interprets the messages from the Hololens and takes the appropriate action.
         """
+        if "disconnected" in data:
+            raise SystemExit("Disconnected from server")
         if self.state == "initial":
             # If this is the first iteration, we need to ask the guesser to rank the options.
             self.guesser.new_guess(data)
@@ -94,20 +102,10 @@ class Dialogue():
                      .format(guess_x, guess_y).encode("utf-8"))
             self.state = "initial"
         self.guesser.print_guess_order()
+    
+    def secure_close(self):
+        self.client.close()
+        os.kill(self.client.pid, signal.SIGTERM)
+        os.close(self.pipe_out_dia)
+        os.close(self.pipe_in_dia)
 
-if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        SERV_ADDR = socket.gethostbyname(socket.gethostname())
-        print("No server address established. Using the local address to this machine: {}"\
-             .format(SERV_ADDR))
-    else:
-        SERV_ADDR = sys.argv[2]
-    if len(sys.argv) < 2:
-        DATA = "default_data.csv"
-        print("No datafile was selected. Using default data: {}".format(DATA))
-    else:
-        DATA = sys.argv[1]
-    print("Starting Dialouge client")
-    DIA = Dialogue(DATA, SERV_ADDR)
-    DIA.run()
-    print("Dialouge client terminated")

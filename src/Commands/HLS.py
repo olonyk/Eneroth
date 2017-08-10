@@ -7,19 +7,14 @@ import select
 import traceback
 import platform
 from subprocess import check_output
-from datetime import datetime
+from .Logger import Logger
 import re
 
 class Server:
     """ A simple TCP server.
     """
     def __init__(self, args):
-        # Set log behaviour
-        if args["-l"]:
-            self.do_log = True
-            self.log_file = "log_txt.txt"
-        if args["-v"]:
-            self.do_print = True
+        self.logger = Logger("Server", args)
 
         # List to keep track of socket descriptors
         self.connection_dict = {}
@@ -38,7 +33,7 @@ class Server:
 
         # Add server socket to the list of readable connections
         self.connection_dict["server"] = self.server_socket
-        self.log("Server started\t addr:\t{}\tport:{} ".format(self.server_socket.getsockname()[0],\
+        self.logger.log("Server started\t addr:\t{}\tport:{} ".format(self.server_socket.getsockname()[0],\
                                                                self.server_socket.getsockname()[1]))
 
 
@@ -57,7 +52,7 @@ class Server:
                     # server_socket
                     sockfd, addr = self.server_socket.accept()
                     self.new_connections.append(sockfd)
-                    self.log("Client (%s, %s) connected" % addr)
+                    self.logger.log("Client (%s, %s) connected" % addr)
 
                 #Some incoming message from a client
                 else:
@@ -66,11 +61,12 @@ class Server:
                         #In Windows, sometimes when a TCP program closes abruptly,
                         # a "Connection reset by peer" exception will be thrown
                         data = sock.recv(self.recv_buffer)
-                        print(data.decode("utf-8"))
+                        self.logger.log("Recieved: '{}' from addr: {}".format(data.decode("utf-8"),\
+                                                                         sock.getpeername()))
                         if data:
                             self.parse(sock, data)
                     except:
-                        self.log("Client (%s, %s) is offline" % addr)
+                        self.logger.log("Client (%s, %s) is offline" % addr)
                         traceback.print_exc()
                         sock.close()
                         self.remove_socket(sock)
@@ -94,7 +90,7 @@ class Server:
         if len(clients_to_pop) > 0:
             for client in clients_to_pop:
                 self.connection_dict.pop(client, None)
-                self.log("Client: {} ".format(client) + "has been removed from the connection" \
+                self.logger.log("Client: {} ".format(client) + "has been removed from the connection" \
                          + "list, due to a broken socket.")
 
     def parse(self, sock, data):
@@ -113,7 +109,7 @@ class Server:
             self.remove_socket(sock)
 
         if data[0] == "client_type":
-            self.log("A new client, '{}', has joined with addr {}".format(data[1], \
+            self.logger.log("A new client, '{}', has joined with addr {}".format(data[1], \
                      sock.getpeername()))
             # New client
             for new_socket in self.new_connections:
@@ -121,13 +117,13 @@ class Server:
                     self.connection_dict[data[1]] = new_socket
                     self.new_connections.remove(new_socket)
                     return
-            self.log("Warning! The new client: {} was not found in".format(data[1]) \
+            self.logger.log("Warning! The new client: {} was not found in".format(data[1]) \
                      + " the list of connections")
         else:
             # A message that should be forwarded
             for client, recipient_socket in self.connection_dict.items():
                 if client == data[0]:
-                    self.send(recipient_socket, data[1])
+                    self.send(recipient_socket, ";".join(data[1:]))
 
     def send(self, recipient_socket, message):
         """ The send command handles the forwarding of messages to different clients of the system.
@@ -136,7 +132,7 @@ class Server:
             recipient_socket.send(message.encode('utf-8'))
             for client, sock in self.connection_dict.items():
                 if sock == recipient_socket:
-                    self.log("A message '{}' has been sent to client '{}'".format(message, client))
+                    self.logger.log("A message '{}' has been sent to client '{}'".format(message, client))
         except:
             # Broken socket connection may be, chat client pressed ctrl+c for example
             recipient_socket.close()
@@ -154,20 +150,3 @@ class Server:
         else:
             return socket.gethostbyname(socket.gethostname())
 
-    def log(self, message):
-        """ Add a time stamp and write the message to the log file.
-        """
-        time = datetime.now()
-        time_stamp = "{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}\t".format(time.year, time.month,\
-                                                                          time.day, time.hour, \
-                                                                          time.minute, time.second)
-        message = "{}\t{}".format(time_stamp, message)
-        if self.do_print:
-            print(message)
-        if self.do_log:
-            with open(self.log_file, "a") as log_file:
-                log_file.write(message + "\n")
-
-if __name__ == "__main__":
-    SERVER = Server()
-    SERVER.run()

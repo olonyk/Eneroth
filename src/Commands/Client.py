@@ -24,7 +24,8 @@ class Client(Process):
                  pipe_out,
                  port=5000,
                  host="localhost",
-                 connection_attempts=10):
+                 connection_attempts=10,
+                 logger=None):
         Process.__init__(self)
         self.client_type = client_type
         self.pipe_in = pipe_in
@@ -32,6 +33,7 @@ class Client(Process):
         self.messages = []
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.settimeout(2)
+        self.logger = logger
 
         if host == "localhost":
             host = self.get_local_ip(platform.system())
@@ -42,13 +44,13 @@ class Client(Process):
             attempt += 1
             try:
                 self.server.connect((host, port))
-                print("Client: Connected to server at ({}, {})".format(host, port))
+                logger.log("Connected to server at ({}, {})".format(host, port))
                 break
             except:
-                print("Unable to connect to server {} at port {}. Trial {}/{}"\
-                      .format(host, port, attempt, connection_attempts))
+                logger.log("Unable to connect to server {} at port {}. Trial {}/{}"\
+                           .format(host, port, attempt, connection_attempts))
         if attempt > connection_attempts:
-            print("Connection failed.")
+            logger.log("Connection failed.")
             sys.exit()
 
         # Present the client for the server so that the server knowns what kind of client this is.
@@ -66,8 +68,7 @@ class Client(Process):
                 if sock == self.server:
                     data = sock.recv(4096)
                     if not data:
-                        print("Disconnected from server")
-                        sys.exit()
+                        os.write(self.pipe_out, "disconnected".encode(encoding='utf_8'))
                     else:
                         os.write(self.pipe_out, data)
                 # Parent process entered a message
@@ -90,7 +91,7 @@ class Client(Process):
     def close(self):
         """ Close the client.
         """
-        print("Client is terminating")
+        self.logger.log("Client is terminating")
         self.server.send("close me".encode("utf-8"))
         os.close(self.pipe_in)
         os.close(self.pipe_out)

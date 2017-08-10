@@ -4,12 +4,11 @@
 """
 
 import csv
-from random import shuffle
+import os
 import math
 from tkinter import *
-import os
+from random import shuffle
 from PIL import ImageTk, Image
-
 from textblob import TextBlob as tb
 
 class Guesser:
