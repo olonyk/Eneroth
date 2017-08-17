@@ -23,7 +23,13 @@ Example:
   python3.5 Eneroth.py Dialogue -th --data_file=db.csv --host=192.168.0.100 --ambigthresh=0.5
   python3.5 Eneroth.py DummySender -vth --host=192.168.0.100 --nrobj=20 --delay=2.0
   python3.5 Eneroth.py Ghost -vth --client_type=hololens --host=192.168.0.100
+  python3.5 Eneroth.py GUI -vt --data_file=lego/Lego_DB.csv
   
+If you are trying to start a local mongo process and get the following error:
+    Failed to start mongodb.service: Unit mongodb.service not found.
+Run:
+    sudo systemctl enable mongod
+    sudo service mongod restart
 """
 
 from docopt import docopt
