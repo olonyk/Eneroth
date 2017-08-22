@@ -34,13 +34,15 @@ class Client(Process):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.settimeout(2)
         self.logger = logger
+        self.is_alive = True
 
         if host == "localhost":
             host = self.get_local_ip(platform.system())
-            
+
+        self.host = host
         # Connect to remote host
         attempt = 0
-        while attempt <= connection_attempts:
+        while attempt < connection_attempts:
             attempt += 1
             try:
                 self.server.connect((host, port))
@@ -49,9 +51,12 @@ class Client(Process):
             except:
                 logger.log("Unable to connect to server {} at port {}. Trial {}/{}"\
                            .format(host, port, attempt, connection_attempts))
-        if attempt > connection_attempts:
+        if attempt >= connection_attempts:
             logger.log("Connection failed.")
-            sys.exit()
+            os.close(self.pipe_in)
+            os.close(self.pipe_out)
+            self.is_alive = False
+            return
 
         # Present the client for the server so that the server knowns what kind of client this is.
         time.sleep(1)

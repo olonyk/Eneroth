@@ -43,7 +43,7 @@ from Commands.DynGUIMongo import GUI_kernel
 
 if __name__ == '__main__':
     args = docopt(__doc__)
-    print(args)
+    #print(args)
     COMMAND = None
     if args["-h"]:
         print(__doc__)

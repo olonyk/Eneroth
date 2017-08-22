@@ -7,3 +7,4 @@ from .HLS import Server
 from .Logger import Logger
 from .BuildDB import BuildDB
 from .DynGUIMongo import GUI
+from .GUI_setup import GUI_setup

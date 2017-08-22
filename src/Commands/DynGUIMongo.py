@@ -1,5 +1,7 @@
 
 import os.path
+from os import listdir
+from os.path import isfile, join, splitext, isdir
 from PIL import Image, ImageTk
 import PIL
 from io import BytesIO
@@ -8,16 +10,28 @@ from tkinter.ttk import Frame, Radiobutton, Label, Scrollbar, Button
 from tkinter import StringVar
 from tkinter import *
 import tkinter as ttk
+from tkinter.filedialog import askdirectory
 from pkg_resources import resource_string, resource_listdir, resource_filename
 import sys
+import csv
 
 from pymongo import MongoClient
 from .Client import Client
 from .Logger import Logger
 from .BuildDB import BuildDB
+from .GUI_setup import GUI_setup
 
 class GUI_kernel:
     def __init__(self, args):
+
+        self.client_tuple = None
+        self.root_setup = None
+        self.app = None
+
+        self.root_setup = Tk()
+        self.app_setup = GUI_setup(self, master=self.root_setup)
+        self.root_setup.mainloop()
+
         # Set up logger and verboser to handle log and verbose
         self.logger = Logger("GUI_kernel", args)
         if args["--data_file"]:
@@ -28,11 +42,11 @@ class GUI_kernel:
         else:
             self.mongo_client = MongoClient(args["--host"], args["--port"])
 
-        self.client_tuple = None
+        
 
-        root = Tk()
-        self.app = GUI(self, master=root)
-        root.mainloop()
+        #root = Tk()
+        #self.app = GUI(self, master=root)
+        #root.mainloop()
 
         """
         a_post = self.mongo_db.find_one()
@@ -97,10 +111,44 @@ class GUI_kernel:
         print("new_experiment")
 
     def connect(self):
-        print("connect")
-        root = Tk()
-        app = Connect_GUI(self, master=root)
-        root.mainloop()
+        args = {"-l":True, "-v":True}
+        client_logger = Logger("GUI client", args)
+
+        # Add adrs and port to configure and to the drop downs
+        self.app_setup.addrs.append(self.app_setup.addr.get())
+        self.app_setup.ports.append(self.app_setup.port.get())
+        self.app_setup.addrs = list(set(self.app_setup.addrs))
+        self.app_setup.ports = list(set(self.app_setup.ports))
+
+        self.app_setup.adr_drop['menu'].delete(0, 'end')
+        for choice in self.app_setup.addrs:
+            self.app_setup.adr_drop['menu'].add_command(label=choice,
+                                                        command=ttk._setit(self.app_setup.addr,
+                                                                           choice))
+        self.app_setup.port_drop['menu'].delete(0, 'end')
+        for choice in self.app_setup.addrs:
+            self.app_setup.port_drop['menu'].add_command(label=choice,
+                                                         command=ttk._setit(self.app_setup.port,
+                                                                            choice))
+
+        # Create a pipe to communicate to the client process
+        pipe_in_client, pipe_out_dia = os.pipe()
+        pipe_in_dia, pipe_out_client = os.pipe()
+        # Create a client object to communicate with the server
+        client = Client(client_type="GUI client",
+                        port=int(self.app_setup.port.get()),
+                        host=self.app_setup.addr.get(),
+                        pipe_in=pipe_in_client,
+                        pipe_out=pipe_out_client,
+                        logger=client_logger)
+        
+        if client.is_alive:
+            client.start()
+            self.client_tuple = (client, pipe_in_client, pipe_out_dia, pipe_in_dia, pipe_out_client)
+            self.app_setup.lbl9['text'] = "Connected to {}".format(client.host)
+        else:
+            self.app_setup.lbl9['text'] = "Connection failed"
+
 
     def send(self, filtered_items):
         if self.client_tuple:
@@ -115,8 +163,68 @@ class GUI_kernel:
     def on_closing(self):
         if self.client_tuple:
             self.client_tuple[0].close()
-        self.app.destroy()
+        if self.app:
+            self.app.destroy()
+        if self.app_setup:
+            config = {"data_base_path":self.app_setup.data_base_path,
+                      "write_to_path":self.app_setup.write_to_path,
+                      "server_adrs":";".join(self.app_setup.addrs),
+                      "server_ports":";".join(self.app_setup.ports)}
+            with open(resource_filename("Commands.resources.config", "config.dat"), 'w') as f:
+                writer = csv.writer(f, delimiter=':')
+                for key, value in config.items():
+                    writer.writerow([key, value])            
+        if self.root_setup:
+            self.root_setup.destroy()
         sys.exit(0)
+    
+    def read_config(self):
+        with open(resource_filename("Commands.resources.config", "config.dat")) as f:
+            config = f.readlines()
+        config = [con.strip().split(":") for con in config]
+        return {key : value for key, value in config}
+
+    def browse_db(self):
+        data_base_path = askdirectory(initialdir = self.app_setup.data_base_path, title="Select folder with data bases")
+        if data_base_path:
+            data_files = [f for f in listdir(data_base_path) if isfile(join(data_base_path, f))]
+            data_files = [files for files in data_files if ".csv" in files]
+            if len(data_files) == 0:
+                data_files.append("No data found")
+            self.app_setup.data_file.set(data_files[0])
+            self.app_setup.db_drop['menu'].delete(0, 'end')
+            for choice in data_files:
+                self.app_setup.db_drop['menu'].add_command(label=choice,
+                                                           command=ttk._setit(self.app_setup.data_file,
+                                                                              choice))
+            self.app_setup.data_base_path = data_base_path
+            if len(data_base_path) > 10:
+                data_base_path = "..." + data_base_path[-10:]
+            self.app_setup.lbl_db3["text"] = data_base_path
+    
+    def browse_part(self):
+        participant_path = askdirectory(initialdir = self.app_setup.write_to_path, title="Select folder")
+        if participant_path:
+            self.app_setup.write_to_path = participant_path
+            part_dirs = [f for f in listdir(participant_path) if isdir(join(participant_path, f))]
+            part_dirs = [dirs for dirs in part_dirs if "participant" in dirs]
+            print(part_dirs)
+            parts = [" ".join(part.split("_")[0:2]) for part in part_dirs]
+            parts = ["New participant"] + parts
+            self.app_setup.dropdown_participant['menu'].delete(0, 'end')
+            for part in parts:
+                self.app_setup.dropdown_participant['menu'].add_command(label=part,
+                                                           command=ttk._setit(self.app_setup.participant,
+                                                                              part))
+            lbl_text = participant_path
+            if len(lbl_text) > 10:
+                lbl_text = "..." + lbl_text[-10:]
+            self.app_setup.lbl4["text"] = lbl_text
+    
+    def launch(self):
+        
+            
+
 
 class GUI(Frame):
     def __init__(self, kernel, master=None):
@@ -129,7 +237,7 @@ class GUI(Frame):
 
         # Create option frame where the buttons are located and the view frame where the images
         # are shown
-        self.master.rowconfigure(0, weight=1)
+        #self.master.rowconfigure(0, weight=1)
         self.master.rowconfigure(1, weight=1)
         self.master.columnconfigure(0, weight=1)
         self.master.bind('<Configure>', self.kernel.layout)
@@ -156,10 +264,17 @@ class GUI(Frame):
         # is updated.
         self.view_labels = []
 
-        btn = Button(self.option_frame, text="New Experiment", command=self.kernel.new_experiment)
-        btn.grid(row=0, column=10, padx=(30, 30), sticky=N+W)
-        btn = Button(self.option_frame, text="Connect to server", command=self.kernel.connect)
-        btn.grid(row=1, column=10, padx=(30, 30), sticky=N+W)
+        btn_frame = Frame(self.option_frame, bg="white")
+        btn_frame.grid(row=0, column=2, rowspan=1, padx=(30, 30), sticky=W+E+N+S)
+        btn = Button(btn_frame, text="Start", command=self.kernel.new_experiment)
+        btn.grid(row=0, column=10, padx=(30, 30), sticky=N+W+E)
+        btn = Button(btn_frame, text="Pick", command=self.kernel.new_experiment)
+        btn.grid(row=2, column=10, padx=(30, 30), sticky=N+W+E)
+        btn = Button(btn_frame, text="Restart", command=self.kernel.new_experiment)
+        btn.grid(row=3, column=10, padx=(30, 30), sticky=N+W+E)
+
+        #btn = Button(self.option_frame, text="Connect to server", command=self.kernel.connect)
+        #btn.grid(row=1, column=10, padx=(30, 30), sticky=N+W)
 
         # Set up the option frame. Start with the color radiobuttons
         self.color_frame = Frame(self.option_frame, background="white")
