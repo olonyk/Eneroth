@@ -6,5 +6,6 @@ from .DummySender import Dummy
 from .HLS import Server
 from .Logger import Logger
 from .BuildDB import BuildDB
-from .DynGUIMongo import GUI
+from .GUI_kernel import GUI_kernel
 from .GUI_setup import GUI_setup
+from .GUI_filter import GUI_filter

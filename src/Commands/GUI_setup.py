@@ -52,6 +52,7 @@ class GUI_setup(Frame):
             listdir(self.data_base_path)
         except FileNotFoundError:
             self.data_base_path = "/"
+        
         data_files = [f for f in listdir(self.data_base_path) if isfile(join(self.data_base_path, f))]
         data_files = [files for files in data_files if ".csv" in files]
         self.data_file = StringVar(master)
@@ -63,15 +64,21 @@ class GUI_setup(Frame):
         btn_browse = Button(frame_data_bases, text="Browse", command=self.kernel.browse_db)
         self.db_drop = OptionMenu(frame_data_bases, self.data_file, *data_files)
         
+        self.data_base_file = join(self.data_base_path, self.data_file.get())
+
         lbl_db1 = Label(frame_data_bases, text="Found in:")
         lbl_db2 = Label(frame_data_bases, text="Choose:")
-        self.lbl_db3 = Label(frame_data_bases, text=self.data_base_path)
+
+        lbl_text = self.data_base_path
+        if len(lbl_text) > 30:
+            lbl_text = "..." + lbl_text[-30:]
+        self.lbl_db3 = Label(frame_data_bases, text=lbl_text)
 
         lbl2.grid(row=0, column=0, columnspan=1, sticky=W+N)
         lbl_db2.grid(row=1, column=0, columnspan=1, sticky=W+N)
         self.db_drop.grid(row=1, column=1, columnspan=3, sticky=E+N)
         lbl_db1.grid(row=2, column=0, columnspan=1, sticky=W+N)
-        self.lbl_db3.grid(row=2, column=1, columnspan=1, sticky=W+N)
+        self.lbl_db3.grid(row=2, column=1, columnspan=3, sticky=W+N)
         btn_browse.grid(row=3, column=3, sticky=E+N)
 
         # Participant
@@ -179,6 +186,7 @@ class GUI_setup(Frame):
         frame_data_bases.grid(row=1, column=1, columnspan=1, rowspan=1, sticky=W+E+N+S)
         frame_participant.grid(row=1, column=0, columnspan=1, rowspan=1, sticky=W+E+N+S)
         frame_server.grid(row=0, column=1, columnspan=1, rowspan=1, sticky=W+E+N+S)
+        btn_launch.grid(row=2, column=1, sticky=E)
 
     def type(self):
         pass

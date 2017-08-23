@@ -12,7 +12,6 @@ from .Logger import Logger
 class BuildDB:
     def __init__(self, args):
         # Set up logger and verboser to handle log and verbose
-        self.logger = Logger("Data Base builder", args)
         self.data_file = args["--data_file"]
         self.data_dir = dirname(args["--data_file"])
 

@@ -3,7 +3,7 @@
     Eneroth.py Dialogue [-th] (--data_file=DB) [--host=HOST] [--ambigthresh=AMBIGTHRESH]
     Eneroth.py DummySender [-vth] [--host=HOST] [--nrobj=NROBJ] [--delay=DELAY]
     Eneroth.py Ghost [-vth] (--client_type=CLIENT_TYPE) [--host=HOST] 
-    Eneroth.py GUI [-vtl] [--data_file=DB]
+    Eneroth.py GUI [-vtl]
 
 Options:
   -h          help
@@ -23,7 +23,7 @@ Example:
   python3.5 Eneroth.py Dialogue -th --data_file=db.csv --host=192.168.0.100 --ambigthresh=0.5
   python3.5 Eneroth.py DummySender -vth --host=192.168.0.100 --nrobj=20 --delay=2.0
   python3.5 Eneroth.py Ghost -vth --client_type=hololens --host=192.168.0.100
-  python3.5 Eneroth.py GUI -vt --data_file=lego/Lego_DB.csv
+  python3.5 Eneroth.py GUI -vt
   
 If you are trying to start a local mongo process and get the following error:
     Failed to start mongodb.service: Unit mongodb.service not found.
@@ -39,7 +39,7 @@ from Commands.DummySender import Dummy
 from Commands.HLS import Server
 from Commands.Dialogue import Dialogue
 from Commands.Ghost import Ghost
-from Commands.DynGUIMongo import GUI_kernel
+from Commands.GUI_kernel import GUI_kernel
 
 if __name__ == '__main__':
     args = docopt(__doc__)
