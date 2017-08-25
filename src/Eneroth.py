@@ -30,6 +30,12 @@ If you are trying to start a local mongo process and get the following error:
 Run:
     sudo systemctl enable mongod
     sudo service mongod restart
+
+TODO:
+    Add and session button and functionallity (connect to win close)
+    Add point at button and no button to be used in dialogue mode
+    Implement point at on YuMi side (not in this package)
+    Reimplement file chooser (import missing in gui setup)
 """
 
 from docopt import docopt
