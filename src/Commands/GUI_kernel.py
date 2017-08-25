@@ -255,7 +255,7 @@ class GUI_kernel:
         """ Send a "pick" command to the YuMi robot
         """
         if self.client_tuple:
-            msg = "yumi;pick:True;X:{};Y:{}".format(block[1], block[2])
+            msg = "yumi;pick;{};{}".format(block[1], block[2])
             os.write(self.client_tuple[2], msg.encode("utf-8"))
 
     def on_closing(self):
