@@ -49,8 +49,17 @@ $ python3.5 Eneroth.py GUI -vt
 4. In the GUI click on "Connect" and click "Launch".
 5. Use the color and shape filters to filter lego parts. Note that the lego parts will show up after a (any) filter is selected.
 
+### Dependencies
+1. docopt
+2. image (PIL)
+3. textblob
+4. pymongo
+These dependencies can easily be installed by running
+``` pip install docopt image textblob pymongo
+```
+A Mongo DB service is also needed to be running. Install and run according to [these instructions](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/)
+
 ### Todos
- - Add a **Dependencies** section to this document.
  - Look over potential memory leaks in the GUI.
 
 
