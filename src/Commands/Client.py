@@ -64,8 +64,11 @@ class Client(Process):
 
     def run(self):
         while True:
-            socket_list = [self.pipe_in, self.server]
-
+            # Windows doesn't allow non blocking select on the pipe self.pipe_in. Thus we need a workaround.
+            if platform.system() == "Windows":
+                socket_list = [self.server]
+            else:
+                socket_list = [self.pipe_in, self.server]
             # Get the list sockets which are readable
             read_sockets, _, _ = select.select(socket_list, [], [])
             for sock in read_sockets:

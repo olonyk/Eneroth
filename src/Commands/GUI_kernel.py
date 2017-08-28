@@ -1,6 +1,7 @@
 
 import csv
 import os.path
+import platform
 import sys
 from datetime import datetime
 from io import BytesIO
@@ -254,14 +255,23 @@ class GUI_kernel:
             msg = ";".join(msg)
             msg = "{};{}".format(self.app.session_type, msg)
             self.log("send", msg)
-            os.write(self.client_tuple[2], msg.encode("utf-8"))
+            self.send(msg.encode("utf-8"))
     
     def send_pick(self, block):
         """ Send a "pick" command to the YuMi robot
         """
         if self.client_tuple:
             msg = "yumi;pick;{};{}".format(block[1], block[2])
-            os.write(self.client_tuple[2], msg.encode("utf-8"))
+            self.send(msg.encode("utf-8"))
+            
+
+    def send(self, msg):
+        # Windows doesn't allow non blocking select on the pipe self.pipe_in. Thus we need thist 
+        # workaround. We esentially bypass the client when writing to the server.
+        if platform.system() == "Windows":
+            self.client_tuple[0].server.send(msg)
+        else:
+            os.write(self.client_tuple[2], msg)
 
     def on_closing(self):
         if self.client_tuple:
