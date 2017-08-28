@@ -8,6 +8,7 @@ from os import listdir
 from os.path import exists, isdir, isfile, join, splitext
 from tkinter import Tk, BOTH, Toplevel, StringVar, IntVar, S, N, E, W, _setit, messagebox
 from tkinter.ttk import Frame, Radiobutton, Label, Scrollbar, Button, OptionMenu, Entry, Checkbutton
+from tkinter.filedialog import askdirectory
 
 import PIL
 from PIL import Image, ImageTk
@@ -40,10 +41,14 @@ class GUI_kernel:
         pass
 # Methods associated with GUI_setup
     def read_config(self):
-        with open(resource_filename("Commands.resources.config", "config.dat")) as f:
-            config = f.readlines()
-        config = [con.strip().split(":") for con in config]
-        return {key : value for key, value in config}
+        config = {}
+        with open(resource_filename("Commands.resources.config", "config.dat"), 'r') as f:
+            csv_reader = csv.reader(f, delimiter=":")
+            for row in csv_reader:
+                if len(row) > 0:
+                    config[row[0]] = row[1]
+
+        return config
 
     def browse_db(self):
         data_base_path = askdirectory(initialdir = self.app_setup.data_base_path, title="Select folder with data bases")
@@ -56,7 +61,7 @@ class GUI_kernel:
             self.app_setup.db_drop['menu'].delete(0, 'end')
             for choice in data_files:
                 self.app_setup.db_drop['menu'].add_command(label=choice,
-                                                           command=ttk._setit(self.app_setup.data_file,
+                                                           command=_setit(self.app_setup.data_file,
                                                                               choice))
             self.app_setup.data_base_path = data_base_path
             self.app_setup.data_base_file = join(data_base_path, self.app_setup.data_file.get())
@@ -75,7 +80,7 @@ class GUI_kernel:
             self.app_setup.dropdown_participant['menu'].delete(0, 'end')
             for part in parts:
                 self.app_setup.dropdown_participant['menu'].add_command(label=part,
-                                                           command=ttk._setit(self.app_setup.participant,
+                                                           command=_setit(self.app_setup.participant,
                                                                               part))
             lbl_text = participant_path
             if len(lbl_text) > 10:

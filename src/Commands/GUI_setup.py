@@ -1,6 +1,6 @@
 
 from os import listdir
-from os.path import isfile, join, splitext, isdir
+from os.path import isfile, join, splitext, isdir, dirname
 
 from tkinter import Tk, BOTH
 from tkinter.ttk import Frame, Radiobutton, Label, Scrollbar, Button, OptionMenu, Entry
@@ -51,7 +51,7 @@ class GUI_setup(Frame):
         try:
             listdir(self.data_base_path)
         except FileNotFoundError:
-            self.data_base_path = "/"
+            self.data_base_path = dirname(__file__)
         
         data_files = [f for f in listdir(self.data_base_path) if isfile(join(self.data_base_path, f))]
         data_files = [files for files in data_files if ".csv" in files]
@@ -86,7 +86,7 @@ class GUI_setup(Frame):
         try:
             listdir(self.write_to_path)
         except FileNotFoundError:
-            self.write_to_path = "/"
+            self.write_to_path = dirname(__file__)
         part_dirs = [f for f in listdir(self.write_to_path) if isdir(join(self.write_to_path, f))]
         part_dirs = [dirs for dirs in part_dirs if "participant" in dirs]
         parts = [" ".join(part.split("_")[0:2]) for part in part_dirs]
