@@ -55,7 +55,8 @@ $ python3.5 Eneroth.py GUI -vt
 3. textblob
 4. pymongo
 These dependencies can easily be installed by running
-``` pip install docopt image textblob pymongo
+```sh
+$ pip install docopt image textblob pymongo
 ```
 A Mongo DB service is also needed to be running. Install and run according to [these instructions](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/)
 
