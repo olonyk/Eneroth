@@ -9,3 +9,5 @@ from .BuildDB import BuildDB
 from .GUI_kernel import GUI_kernel
 from .GUI_setup import GUI_setup
 from .GUI_filter import GUI_filter
+from .Reset import Reset
+from .YuMiControl import YuMiControl
