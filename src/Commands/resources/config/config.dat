@@ -1,4 +1,4 @@
-write_to_path:"D:/Workspace/Experiments"
-server_ports:5000
-server_adrs:localhost;192.168.1.8
-data_base_path:"D:/Workspace/Eneroth/lego"
+server_adrs:localhost;192.168.1.8
+write_to_path:/media/olov/Data_ext4/Workspace/Eneroth/src/experiments
+server_ports:5000
+data_base_path:/media/olov/Data_ext4/Workspace/Eneroth/src/lego

@@ -7,6 +7,7 @@ from datetime import datetime
 from io import BytesIO
 from os import listdir
 from os.path import exists, isdir, isfile, join, splitext
+import time
 from tkinter import Tk, BOTH, Toplevel, StringVar, IntVar, S, N, E, W, _setit, messagebox
 from tkinter.ttk import Frame, Radiobutton, Label, Scrollbar, Button, OptionMenu, Entry, Checkbutton
 from tkinter.filedialog import askdirectory
@@ -29,7 +30,8 @@ class GUI_kernel:
 
         self.client_tuple = None
         self.root_setup = None
-        self.app = None
+        self.app_filter = None
+        self.root_filter = None
         self.run_time = False
         self.log_file = False
         self.filtered_items = []
@@ -140,6 +142,9 @@ class GUI_kernel:
                 if not messagebox.askyesno("No connection to server", "Continue anyway?"):
                     return
             
+            # Write settings to config
+            self.write_config()
+
             # Create a new participant folder
             folder_name = "participant_{}_session_{}".format(self.app_setup.participant.get(),
                                                              self.app_setup.rbType.get())
@@ -171,14 +176,14 @@ class GUI_kernel:
                 self.log("info","Server adr: {}".format(self.client_tuple[0].host))
             self.log("","")
 
-            root = Toplevel()
-            self.app = GUI_filter(self,
-                                  master=root,
+            self.root_filter = Toplevel()
+            self.app_filter = GUI_filter(self,
+                                  master=self.root_filter,
                                   title="{} {}".format(self.app_setup.participant.get(),
                                                        self.app_setup.rbType.get()),
                                   session_type=self.app_setup.rbType.get())
-            self.app.launch()
-            root.mainloop()
+            self.app_filter.launch()
+            self.root_filter.mainloop()
 
 # Methods associated with GUI_filter
     def get_colors(self):
@@ -230,13 +235,13 @@ class GUI_kernel:
         self.log("new filter", "Color: {} Shape: {}".format(gui.color.get(), gui.shape.get()))
 
     def layout(self, event):
-        if len(self.app.view_labels) > 0:
+        if len(self.app_filter.view_labels) > 0:
             # Calculate how many images to display per row.
-            items_per_row = int(self.app.view_canvas.winfo_width() / self.app.view_checks[0].winfo_width())
+            items_per_row = int(self.app_filter.view_canvas.winfo_width() / self.app_filter.view_checks[0].winfo_width())
             if items_per_row < 1:
                 items_per_row = 1
-            for i, widget in enumerate(self.app.view_labels):
-                self.app.view_checks[i].grid(row=int(i/items_per_row), column=i%items_per_row)
+            for i, widget in enumerate(self.app_filter.view_labels):
+                self.app_filter.view_checks[i].grid(row=int(i/items_per_row), column=i%items_per_row)
                 widget.grid(row=int(i/items_per_row), column=i%items_per_row, sticky=S+E, padx=(0, 5), pady=(0, 5))
 
     def new_experiment(self):
@@ -245,77 +250,92 @@ class GUI_kernel:
     def send_pos(self):
         """ Send id and position to the reciever depending on the experiment type
         """
-        if self.client_tuple:
+        if self.client_tuple and not (self.app_filter.color.get() == "all" and
+           self.app_filter.shape.get() == "all"):
             msg = []
             for i, item in enumerate(self.filtered_items):
-                if self.app.view_ch_val[i].get():
+                if self.app_filter.view_ch_val[i].get():
                     msg.append("{},{},{}".format(item["ID"],
                                                 item["X"],
                                                 item["Y"]))
             msg = ";".join(msg)
-            msg = "{};{}".format(self.app.session_type, msg)
+            msg = "{};{}".format(self.app_filter.session_type, msg)
             self.log("send", msg)
             self.send(msg.encode("utf-8"))
-    
-    def send_pick(self, block):
-        """ Send a "pick" command to the YuMi robot
-        """
-        if self.client_tuple:
-            msg = "yumi;pick;{};{}".format(block[1], block[2])
-            self.send(msg.encode("utf-8"))
-            
 
     def send(self, msg):
-        # Windows doesn't allow non blocking select on the pipe self.pipe_in. Thus we need thist 
-        # workaround. We esentially bypass the client when writing to the server.
-        if platform.system() == "Windows":
-            self.client_tuple[0].server.send(msg)
-        else:
-            os.write(self.client_tuple[2], msg)
-
-    def on_closing(self):
+        """ Send the message "msg" of type byte encoded with utf-8 to the server. Windows doesn't
+            allow non blocking select on the pipe self.pipe_in. Thus we need thist workaround. We
+            esentially bypass the client when writing to the server.
+        """
         if self.client_tuple:
-            self.client_tuple[0].close()
-        if self.app:
-            self.log("info", "session exit")
-            self.app.destroy()
-        if self.app_setup:
-            config = {"data_base_path":self.app_setup.data_base_path,
-                      "write_to_path":self.app_setup.write_to_path,
-                      "server_adrs":";".join(self.app_setup.addrs),
-                      "server_ports":";".join(self.app_setup.ports)}
-            with open(resource_filename("Commands.resources.config", "config.dat"), 'w') as f:
-                writer = csv.writer(f, delimiter=':')
-                for key, value in config.items():
-                    writer.writerow([key, value])            
-        if self.root_setup:
-            self.root_setup.destroy()
-        sys.exit(0)
+            if platform.system() == "Windows":
+                self.client_tuple[0].server.send(msg)
+            else:
+                os.write(self.client_tuple[2], msg)
+
+    def close_setup(self):
+        """ Handels the close operation of the setup window. This halts the execution.
+        """
+        if messagebox.askyesno("Exit", "Are you sure you want to close the application?"):
+            if self.client_tuple:
+                print(type(self.client_tuple[0]))
+                self.client_tuple[0].close()
+                self.client_tuple[0].wait()
+            if self.app_filter:
+                self.log("info", "session exit")
+                self.root_filter.destroy()       
+            if self.root_setup:
+                self.root_setup.destroy()
+            sys.exit(0)
+    
+    def close_filter(self):
+        """ Handels the close operation of the filter window.
+        """
+        if messagebox.askyesno("Exit", "Are you sure you want to close the experiment?"):
+            if self.app_filter:
+                self.log("info", "session exit")
+                self.root_filter.destroy()
+                self.root_filter = None
+                self.app_filter = None
+
+
 
     def start(self):
         # (Re)set the runtime
         self.run_time = datetime.now()
         # (Re)set the filter options
-        self.app.color.set("all")
-        self.app.shape.set("all")
-        self.update_filter(self.app)
+        self.app_filter.color.set("all")
+        self.app_filter.shape.set("all")
+        self.update_filter(self.app_filter)
         self.log("start", "Start")
     
-    def pick(self):
+    def send_pick(self):
+        """ Send pick command to YuMi on the format: yumi;pick;x;y where yumi is the address where
+            to send the message pick is the command that is handeled by the yumi interpreter and x
+            and y are the coordinates off the intended block on the board. Origo of the coordinate
+            system for x and y is the far left corner of the board as seen from YuMi. Also send a
+            "clear" command to the hololens.
+        """
         if len(self.filtered_items) > 0:
             block = False
             for i, item in enumerate(self.filtered_items):
-                if self.app.view_ch_val[i].get():
+                if self.app_filter.view_ch_val[i].get():
                     block = (item["ID"], item["X"], item["Y"])
                     break
             if block:
                 self.log("pick", "Pick block {d[0]} at ({d[1]}, {d[2]})".format(d=block))
                 self.send_pick(block)
                 self.run_time = datetime.now()
-        
-
+                # Send pick to YuMi
+                self.send("yumi;pick;{};{}".format(block[1], block[2]).encode("utf-8"))
+                time.sleep(0.5)
+                # Send clear to hololens
+                self.send("hololens;clear".encode("utf-8"))
 
     def log(self, msg_type, msg):
+        """ Log the current action to the log file.
+        """
         time = datetime.now()
         curr_time = ""
         if self.run_time:
@@ -332,3 +352,15 @@ class GUI_kernel:
         if self.log_file:
             with open(self.log_file, "a") as log_file:
                 log_file.write(msg + "\n")
+
+    def write_config(self):
+        """ Write settings to the configuration file.
+        """
+        config = {"data_base_path":self.app_setup.data_base_path,
+                  "write_to_path":self.app_setup.write_to_path,
+                  "server_adrs":";".join(self.app_setup.addrs),
+                  "server_ports":";".join(self.app_setup.ports)}
+        with open(resource_filename("Commands.resources.config", "config.dat"), 'w') as f:
+            writer = csv.writer(f, delimiter=':')
+            for key, value in config.items():
+                writer.writerow([key, value])

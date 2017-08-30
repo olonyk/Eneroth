@@ -17,7 +17,7 @@ class GUI_setup(Frame):
         self.grid()
         self.master.title("YuMi experiment")
         self.client_tuple = None
-        self.master.protocol("WM_DELETE_WINDOW", self.kernel.on_closing)
+        self.master.protocol("WM_DELETE_WINDOW", self.kernel.close_setup)
         #self.master.geometry("100x100+500+100")
 
         config = self.kernel.read_config()

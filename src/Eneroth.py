@@ -1,3 +1,4 @@
+#!/usr/bin/env python3.5
 """Usage:
     Eneroth.py Server [-vlth]
     Eneroth.py Dialogue [-th] (--data_file=DB) [--host=HOST] [--ambigthresh=AMBIGTHRESH]
