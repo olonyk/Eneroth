@@ -64,3 +64,15 @@ target/
 *.jpg
 
 *.txt
+
+*.cmake
+
+*.sh
+
+*.make
+
+CMakeFiles/*
+devel/*
+gtest/*
+catkin/*
+catkin_generated/*

@@ -25,11 +25,11 @@ Eneroth.py GUI [-vtl]
 
 ### Example:
 ```sh
-  python3.5 Eneroth.py Server -vlt
-  python3.5 Eneroth.py Dialogue -th --data_file=db.csv --host=192.168.0.100 --ambigthresh=0.5
-  python3.5 Eneroth.py DummySender -vth --host=192.168.0.100 --nrobj=20 --delay=2.0
-  python3.5 Eneroth.py Ghost -vth --client_type=hololens --host=192.168.0.100
-  python3.5 Eneroth.py GUI -vt
+  rosrun Eneroth Eneroth.py Server -vlt
+  rosrun Eneroth Eneroth.py Dialogue -th --data_file=db.csv --host=192.168.0.100 --ambigthresh=0.5
+  rosrun Eneroth Eneroth.py DummySender -vth --host=192.168.0.100 --nrobj=20 --delay=2.0
+  rosrun Eneroth Eneroth.py Ghost -vth --client_type=hololens --host=192.168.0.100
+  rosrun Eneroth Eneroth.py GUI -vt
  ```
  
  ### User example:

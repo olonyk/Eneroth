@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package>
+  <name>Eneroth</name>
+  <version>0.1.0</version>
+  <description>High level control for YuMi and Hololens experiments</description>
+
+
+  <maintainer email="onykvist@kth.se">Olov Nykvist</maintainer>
+
+  <license>BSD</license>
+
+  <author>Olov Nykvist</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+</package>
