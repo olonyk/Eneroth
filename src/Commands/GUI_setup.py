@@ -62,7 +62,7 @@ class GUI_setup(Frame):
 
         lbl2 = Label(frame_data_bases, text="Data base")
         btn_browse = Button(frame_data_bases, text="Browse", command=self.kernel.browse_db)
-        self.db_drop = OptionMenu(frame_data_bases, self.data_file, *data_files)
+        self.db_drop = OptionMenu(frame_data_bases, self.data_file, *data_files, command=self.kernel.set_db)
         
         self.data_base_file = join(self.data_base_path, self.data_file.get())
 

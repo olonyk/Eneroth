@@ -162,6 +162,7 @@ class GUI_kernel:
             self.log_file = join(self.log_file, "log.csv")
 
             # Read and create data base
+            print(self.app_setup.data_base_file)
             builder = BuildDB({"--data_file":self.app_setup.data_base_file})
             self.mongo_db = builder.build()
 
@@ -184,6 +185,10 @@ class GUI_kernel:
                                   session_type=self.app_setup.rbType.get())
             self.app_filter.launch()
             self.root_filter.mainloop()
+
+    def set_db(self, _):
+        self.app_setup.data_base_file = join(self.app_setup.data_base_path, self.app_setup.data_file.get())
+        print("New database:", self.app_setup.data_base_file)
 
 # Methods associated with GUI_filter
     def get_colors(self):
@@ -325,7 +330,6 @@ class GUI_kernel:
                     break
             if block:
                 self.log("pick", "Pick block {d[0]} at ({d[1]}, {d[2]})".format(d=block))
-                self.send_pick(block)
                 self.run_time = datetime.now()
                 # Send pick to YuMi
                 self.send("yumi;pick;{};{}".format(block[1], block[2]).encode("utf-8"))
