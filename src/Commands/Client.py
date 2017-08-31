@@ -104,4 +104,3 @@ class Client(Process):
         os.close(self.pipe_in)
         os.close(self.pipe_out)
         self.server.close()
-        self.kill()
