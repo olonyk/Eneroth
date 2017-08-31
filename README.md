@@ -61,11 +61,6 @@ $ pip install docopt image textblob pymongo
 A Mongo DB service is also needed to be running. Install and run according to [these instructions](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/)
 
 ### Todos
- - Don't send all objects when no filters are selected. (Done)
- - On "pick", send "clear" to hololens. (Done)
- - Add safe exit from filter gui. (In progress)
- - Add "point" and "no" buttons to filter gui.
- - Remove restart button from filter gui.
  - Look over potential memory leaks in the GUI.
 
 
