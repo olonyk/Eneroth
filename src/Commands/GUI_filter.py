@@ -33,6 +33,10 @@ class GUI_filter(Frame):
         self.master.title(self.title)
         self.master.geometry("950x950+500+100")
 
+        # Use this list to keep references to the images used in the buttons. Without a reference
+        # the garbage collector will remove them!
+        self.images = []
+
         # Create option frame where the buttons are located and the view frame where the images
         # are shown
         self.master.rowconfigure(1, weight=1)
@@ -65,12 +69,25 @@ class GUI_filter(Frame):
 
         btn_frame = Frame(self.option_frame, bg="white")
         btn_frame.grid(row=0, column=2, rowspan=1, padx=(30, 30), sticky=W+E+N+S)
-        btn = Button(btn_frame, text="Start", command=self.kernel.start)
-        btn.grid(row=0, column=10, padx=(30, 30), sticky=N+W+E)
+
         btn = Button(btn_frame, text="Pick", command=self.kernel.send_pick)
-        btn.grid(row=2, column=10, padx=(30, 30), sticky=N+W+E)
-        btn = Button(btn_frame, text="Restart", command=self.kernel.start)
-        btn.grid(row=3, column=10, padx=(30, 30), sticky=N+W+E)
+        btn.grid(row=0, column=0, padx=(5, 5), sticky=N+W+E)
+        btn = Button(btn_frame, text="Point", command=self.kernel.send_point)
+        btn.grid(row=1, column=0, padx=(5, 5), sticky=N+W+E)
+        btn = Button(btn_frame, text="No", command=self.kernel.log_no)
+        btn.grid(row=2, column=0, padx=(5, 5), sticky=N+W+E)
+        self.start_btn = Button(btn_frame, text="Start", command=self.kernel.start)
+        self.start_btn.grid(row=0, column=1, padx=(5, 5), sticky=N+W+E)
+        btn = Button(btn_frame, text="End session", command=self.kernel.close_filter)
+        btn.grid(row=1, column=1, padx=(5, 5), sticky=N+W+E)
+        btn = Button(btn_frame, text="Unselect all", command=self.kernel.unselect)
+        btn.grid(row=2, column=1, padx=(5, 5), sticky=N+W+E)
+
+        img1 = ImageTk.PhotoImage(PIL.Image.open(resource_filename("Commands.resources.images",
+                                                                   "back.png")))
+        self.init_lbl = Label(btn_frame, image=img1, bg="white")
+        self.init_lbl.grid(row=0, column=2, padx=(5, 5), sticky=N+W+E)
+        self.images.append(img1)
 
         # Set up the option frame. Start with the color radiobuttons
         self.color_frame = Frame(self.option_frame, background="white")
@@ -92,9 +109,7 @@ class GUI_filter(Frame):
                           indicatoron=False)
         rb1.grid(row=1, column=0, rowspan=2, sticky=W+E+N+S)
 
-        # Use this list to keep references to the images used in the buttons. Without a reference
-        # the garbage collector will remove them!
-        self.images = []
+        
         self.images.append(photo_select_def)
         self.images.append(photo_def)
         for i, col in enumerate(colors):

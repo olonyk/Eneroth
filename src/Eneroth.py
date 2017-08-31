@@ -49,8 +49,6 @@ from Commands.HLS import Server
 from Commands.Dialogue import Dialogue
 from Commands.Ghost import Ghost
 from Commands.GUI_kernel import GUI_kernel
-from Commands.Reset import Reset
-from Commands.YuMiControl import YuMiControl
 
 if __name__ == '__main__':
     args = docopt(__doc__)
@@ -68,10 +66,7 @@ if __name__ == '__main__':
         COMMAND = Ghost(args)
     elif args["GUI"]:
         COMMAND = GUI_kernel(args)
-    elif args["Reset"]:
-        COMMAND = Reset(args)
-    elif args["YuMi"]:
-        COMMAND = YuMiControl(args)
+
     if COMMAND:
         if args["-t"]:
             S_TIME = datetime.now()

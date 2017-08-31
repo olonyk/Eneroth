@@ -35,7 +35,7 @@ class GUI_kernel:
         self.run_time = False
         self.log_file = False
         self.filtered_items = []
-
+        self.curr_block = None
         self.root_setup = Tk()
         self.app_setup = GUI_setup(self, master=self.root_setup)
         self.root_setup.mainloop()
@@ -54,7 +54,8 @@ class GUI_kernel:
         return config
 
     def browse_db(self):
-        data_base_path = askdirectory(initialdir = self.app_setup.data_base_path, title="Select folder with data bases")
+        data_base_path = askdirectory(initialdir=self.app_setup.data_base_path,
+                                      title="Select folder with data bases")
         if data_base_path:
             data_files = [f for f in listdir(data_base_path) if isfile(join(data_base_path, f))]
             data_files = [files for files in data_files if ".csv" in files]
@@ -65,15 +66,16 @@ class GUI_kernel:
             for choice in data_files:
                 self.app_setup.db_drop['menu'].add_command(label=choice,
                                                            command=_setit(self.app_setup.data_file,
-                                                                              choice))
+                                                                          choice))
             self.app_setup.data_base_path = data_base_path
             self.app_setup.data_base_file = join(data_base_path, self.app_setup.data_file.get())
             if len(data_base_path) > 30:
                 data_base_path = "..." + data_base_path[-30:]
             self.app_setup.lbl_db3["text"] = data_base_path
-    
+
     def browse_part(self):
-        participant_path = askdirectory(initialdir = self.app_setup.write_to_path, title="Select folder")
+        participant_path = askdirectory(initialdir=self.app_setup.write_to_path,
+                                        title="Select folder")
         if participant_path:
             self.app_setup.write_to_path = participant_path
             part_dirs = [f for f in listdir(participant_path) if isdir(join(participant_path, f))]
@@ -83,13 +85,13 @@ class GUI_kernel:
             self.app_setup.dropdown_participant['menu'].delete(0, 'end')
             for part in parts:
                 self.app_setup.dropdown_participant['menu'].add_command(label=part,
-                                                           command=_setit(self.app_setup.participant,
-                                                                              part))
+                                                                        command=_setit(self.app_setup.participant,
+                                                                                       part))
             lbl_text = participant_path
             if len(lbl_text) > 10:
                 lbl_text = "..." + lbl_text[-10:]
             self.app_setup.lbl4["text"] = lbl_text
-    
+
     def connect(self):
         args = {"-l":False, "-v":False}
         client_logger = Logger("GUI client", args)
@@ -104,12 +106,12 @@ class GUI_kernel:
         for choice in self.app_setup.addrs:
             self.app_setup.adr_drop['menu'].add_command(label=choice,
                                                         command=_setit(self.app_setup.addr,
-                                                                           choice))
+                                                                       choice))
         self.app_setup.port_drop['menu'].delete(0, 'end')
         for choice in self.app_setup.addrs:
             self.app_setup.port_drop['menu'].add_command(label=choice,
                                                          command=_setit(self.app_setup.port,
-                                                                            choice))
+                                                                        choice))
 
         # Create a pipe to communicate to the client process
         pipe_in_client, pipe_out_dia = os.pipe()
@@ -121,7 +123,7 @@ class GUI_kernel:
                         pipe_in=pipe_in_client,
                         pipe_out=pipe_out_client,
                         logger=client_logger)
-        
+
         if client.is_alive:
             client.start()
             self.client_tuple = (client, pipe_in_client, pipe_out_dia, pipe_in_dia, pipe_out_client)
@@ -141,7 +143,7 @@ class GUI_kernel:
             if not self.client_tuple:
                 if not messagebox.askyesno("No connection to server", "Continue anyway?"):
                     return
-            
+
             # Write settings to config
             self.write_config()
 
@@ -189,6 +191,22 @@ class GUI_kernel:
     def set_db(self, _):
         self.app_setup.data_base_file = join(self.app_setup.data_base_path, self.app_setup.data_file.get())
         print("New database:", self.app_setup.data_base_file)
+
+    def close_setup(self):
+        """ Handels the close operation of the setup window. This halts the execution.
+        """
+        if messagebox.askyesno("Exit", "Are you sure you want to close the application?"):
+            if self.client_tuple:
+                self.client_tuple[0].close()
+                self.client_tuple[0].terminate()
+                self.client_tuple[0].join()
+                self.client_tuple = None
+            if self.app_filter:
+                self.log("info", "session exit")
+                self.root_filter.destroy()       
+            if self.root_setup:
+                self.root_setup.destroy()
+            sys.exit(0)
 
 # Methods associated with GUI_filter
     def get_colors(self):
@@ -279,20 +297,7 @@ class GUI_kernel:
             else:
                 os.write(self.client_tuple[2], msg)
 
-    def close_setup(self):
-        """ Handels the close operation of the setup window. This halts the execution.
-        """
-        if messagebox.askyesno("Exit", "Are you sure you want to close the application?"):
-            if self.client_tuple:
-                print(type(self.client_tuple[0]))
-                self.client_tuple[0].close()
-                self.client_tuple[0].wait()
-            if self.app_filter:
-                self.log("info", "session exit")
-                self.root_filter.destroy()       
-            if self.root_setup:
-                self.root_setup.destroy()
-            sys.exit(0)
+
     
     def close_filter(self):
         """ Handels the close operation of the filter window.
@@ -314,6 +319,8 @@ class GUI_kernel:
         self.app_filter.shape.set("all")
         self.update_filter(self.app_filter)
         self.log("start", "Start")
+        self.app_filter.start_btn["text"] = "Restart"
+        self.app_filter.init_lbl.grid_forget()
     
     def send_pick(self):
         """ Send pick command to YuMi on the format: yumi;pick;x;y where yumi is the address where
@@ -336,6 +343,39 @@ class GUI_kernel:
                 time.sleep(0.5)
                 # Send clear to hololens
                 self.send("hololens;clear".encode("utf-8"))
+                self.curr_block = None
+
+    def send_point(self):
+        """ Send point command to YuMi on the format: yumi;point;x;y where yumi is the address where
+            to send the message pick is the command that is handeled by the yumi interpreter and x
+            and y are the coordinates off the intended block on the board. Origo of the coordinate
+            system for x and y is the far left corner of the board as seen from YuMi. Also send a
+            "clear" command to the hololens.
+        """
+        if len(self.filtered_items) > 0:
+            block = False
+            for i, item in enumerate(self.filtered_items):
+                if self.app_filter.view_ch_val[i].get():
+                    block = (item["ID"], item["X"], item["Y"])
+                    break
+            if block:
+                self.curr_block = block
+                self.log("point", "Point at block {d[0]} at ({d[1]}, {d[2]})".format(d=block))
+                # Send point command to YuMi
+                self.send("yumi;pick;{};{}".format(block[1], block[2]).encode("utf-8"))
+                time.sleep(0.5)
+
+    def unselect(self):
+        if len(self.filtered_items) > 0:
+            for i, item in enumerate(self.filtered_items):
+                self.app_filter.view_ch_val[i].set(False)
+
+    def log_no(self):
+        if self.curr_block:
+            self.log("No", "User said no to block {d[0]} at ({d[1]}, {d[2]})".format(d=self.curr_block))
+        else:
+            self.log("No", "User said no to block")
+        self.curr_block = None
 
     def log(self, msg_type, msg):
         """ Log the current action to the log file.
