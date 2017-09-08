@@ -11,3 +11,4 @@ from .GUI_setup import GUI_setup
 from .GUI_filter import GUI_filter
 from .Reset import Reset
 from .YuMiControl import YuMiControl
+from .ReachTester import ReachTester

@@ -46,13 +46,18 @@ class Client(Process):
             attempt += 1
             try:
                 self.server.connect((host, port))
-                logger.log("Connected to server at ({}, {})".format(host, port))
+                if logger:
+                    logger.log("Connected to server at ({}, {})".format(host, port))
                 break
             except:
-                logger.log("Unable to connect to server {} at port {}. Trial {}/{}"\
-                           .format(host, port, attempt, connection_attempts))
+                if logger:
+                    logger.log("Unable to connect to server {} at port {}. Trial {}/{}"\
+                               .format(host, port, attempt, connection_attempts))
         if attempt >= connection_attempts:
-            logger.log("Connection failed.")
+            if logger:
+                logger.log("Connection failed.")
+            else:
+                print("Connection failed.")
             os.close(self.pipe_in)
             os.close(self.pipe_out)
             self.is_alive = False
@@ -99,7 +104,8 @@ class Client(Process):
     def close(self):
         """ Close the client.
         """
-        self.logger.log("Client is terminating")
+        if self.logger:
+            self.logger.log("Client is terminating")
         self.server.send("close me".encode("utf-8"))
         os.close(self.pipe_in)
         os.close(self.pipe_out)

@@ -344,6 +344,7 @@ class GUI_kernel:
                 # Send clear to hololens
                 self.send("hololens;clear".encode("utf-8"))
                 self.curr_block = None
+            self.start()
 
     def send_point(self):
         """ Send point command to YuMi on the format: yumi;point;x;y where yumi is the address where
