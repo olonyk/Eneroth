@@ -4,6 +4,7 @@
     Eneroth.py Dialogue [-th] (--data_file=DB) [--host=HOST] [--ambigthresh=AMBIGTHRESH]
     Eneroth.py DummySender [-vth] [--host=HOST] [--nrobj=NROBJ] [--delay=DELAY]
     Eneroth.py Ghost [-vth] (--client_type=CLIENT_TYPE) [--host=HOST] 
+    Eneroth.py ReachTester [-vtl]
     Eneroth.py GUI [-vtl]
     Eneroth.py Reset
     Eneroth.py YuMi
@@ -27,6 +28,7 @@ Example:
   python3.5 Eneroth.py DummySender -vth --host=192.168.0.100 --nrobj=20 --delay=2.0
   python3.5 Eneroth.py Ghost -vth --client_type=hololens --host=192.168.0.100
   python3.5 Eneroth.py GUI -vt
+  python3.5 Eneroth.py ReachTester
   
 If you are trying to start a local mongo process and get the following error:
     Failed to start mongodb.service: Unit mongodb.service not found.
@@ -49,6 +51,7 @@ from Commands.HLS import Server
 from Commands.Dialogue import Dialogue
 from Commands.Ghost import Ghost
 from Commands.GUI_kernel import GUI_kernel
+from Commands.ReachTester import ReachTester
 
 if __name__ == '__main__':
     args = docopt(__doc__)
@@ -66,6 +69,8 @@ if __name__ == '__main__':
         COMMAND = Ghost(args)
     elif args["GUI"]:
         COMMAND = GUI_kernel(args)
+    elif args["ReachTester"]:
+        COMMAND = ReachTester(args)
 
     if COMMAND:
         if args["-t"]:
