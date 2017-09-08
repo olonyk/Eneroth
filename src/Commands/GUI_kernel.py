@@ -313,7 +313,7 @@ class GUI_kernel:
 
     def start(self):
         # (Re)set the runtime
-        self.run_time = datetime.now()
+        self.run_time = time.time()
         # (Re)set the filter options
         self.app_filter.color.set("all")
         self.app_filter.shape.set("all")
@@ -337,7 +337,7 @@ class GUI_kernel:
                     break
             if block:
                 self.log("pick", "Pick block {d[0]} at ({d[1]}, {d[2]})".format(d=block))
-                self.run_time = datetime.now()
+                self.run_time = time.time()
                 # Send pick to YuMi
                 self.send("yumi;pick;{};{}".format(block[1], block[2]).encode("utf-8"))
                 time.sleep(0.5)
@@ -381,22 +381,18 @@ class GUI_kernel:
     def log(self, msg_type, msg):
         """ Log the current action to the log file.
         """
-        time = datetime.now()
+        time_now = datetime.now()
         curr_time = ""
         if self.run_time:
-            curr_time = time - self.run_time
-        msg = "{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}\t{}\t{}\t{}".format(time.year,
-                                                                         time.month,
-                                                                         time.day,
-                                                                         time.hour,
-                                                                         time.minute,
-                                                                         time.second,
-                                                                         curr_time,
-                                                                         msg_type,
-                                                                         msg)
+            curr_time = "{:04f}".format(time.time() - self.run_time)
+        msg = [time_now.year, time_now.month, time_now.day, time_now.hour, time_now.minute,
+               time_now.second, time_now.microsecond, curr_time, msg_type, msg]
         if self.log_file:
             with open(self.log_file, "a") as log_file:
-                log_file.write(msg + "\n")
+                writer = csv.writer(log_file, delimiter=';')
+                writer.writerow(msg)
+
+        
 
     def write_config(self):
         """ Write settings to the configuration file.
