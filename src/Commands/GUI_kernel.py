@@ -34,6 +34,7 @@ class GUI_kernel:
         self.root_filter = None
         self.run_time = False
         self.log_file = False
+        self.id_id = {}
         self.filtered_items = []
         self.curr_block = None
         self.root_setup = Tk()
@@ -133,6 +134,7 @@ class GUI_kernel:
 
     def launch(self):
         if self.app_setup:
+            self.id_id = {}
             # Check if a database file is chosen
             if not isfile(self.app_setup.data_base_file):
                 messagebox.showinfo("Error", "The file {} is not found"\
@@ -248,7 +250,10 @@ class GUI_kernel:
                 val = IntVar()
                 val.set(1)
                 gui.view_checks.append(Checkbutton(gui.view_frame, image=photo, variable=val, command=self.send_pos))
-                gui.view_labels.append(Label(gui.view_frame, text=item["ID"], background="white"))
+                if item["ID"] in self.id_id.keys():
+                    gui.view_labels.append(Label(gui.view_frame, text=self.id_id[item["ID"]], background="white"))
+                else:
+                    gui.view_labels.append(Label(gui.view_frame, text="", background="white"))
                 gui.view_ch_val.append(val)
                 gui.photos.append(photo)
             self.layout(None)
@@ -278,6 +283,9 @@ class GUI_kernel:
             msg = []
             for i, item in enumerate(self.filtered_items):
                 if self.app_filter.view_ch_val[i].get():
+                    if not item["ID"] in self.id_id.keys():
+                        self.id_id[item["ID"]] = len(self.id_id.keys())
+                        self.app_filter.view_labels[i]['text'] = self.id_id[item["ID"]]
                     msg.append("{},{},{}".format(item["ID"],
                                                 item["X"],
                                                 item["Y"]))
@@ -317,6 +325,7 @@ class GUI_kernel:
         # (Re)set the filter options
         self.app_filter.color.set("all")
         self.app_filter.shape.set("all")
+        self.id_id = {}        
         self.update_filter(self.app_filter)
         self.log("start", "Start")
         self.app_filter.start_btn["text"] = "Restart"
