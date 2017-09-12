@@ -3,14 +3,19 @@ import csv
 import os.path
 import platform
 import sys
+import threading
+import time
 from datetime import datetime
 from io import BytesIO
+from math import pow, sqrt
+from multiprocessing import Queue
 from os import listdir
 from os.path import exists, isdir, isfile, join, splitext
-import time
-from tkinter import Tk, BOTH, Toplevel, StringVar, IntVar, S, N, E, W, _setit, messagebox
-from tkinter.ttk import Frame, Radiobutton, Label, Scrollbar, Button, OptionMenu, Entry, Checkbutton
+from tkinter import (BOTH, E, IntVar, N, S, StringVar, Tk, Toplevel, W, _setit,
+                     messagebox)
 from tkinter.filedialog import askdirectory
+from tkinter.ttk import (Button, Checkbutton, Entry, Frame, Label, OptionMenu,
+                         Radiobutton, Scrollbar)
 
 import PIL
 from PIL import Image, ImageTk
@@ -34,6 +39,9 @@ class GUI_kernel:
         self.root_filter = None
         self.run_time = False
         self.log_file = False
+        self.mongo_db = None
+        self.update = False
+        self.update_queue = None
         self.id_id = {}
         self.filtered_items = []
         self.curr_block = None
@@ -114,6 +122,7 @@ class GUI_kernel:
                                                          command=_setit(self.app_setup.port,
                                                                         choice))
 
+        self.update_queue = Queue()
         # Create a pipe to communicate to the client process
         pipe_in_client, pipe_out_dia = os.pipe()
         pipe_in_dia, pipe_out_client = os.pipe()
@@ -123,7 +132,8 @@ class GUI_kernel:
                         host=self.app_setup.addr.get(),
                         pipe_in=pipe_in_client,
                         pipe_out=pipe_out_client,
-                        logger=client_logger)
+                        logger=client_logger,
+                        work=self.update_queue)
 
         if client.is_alive:
             client.start()
@@ -166,9 +176,12 @@ class GUI_kernel:
             self.log_file = join(self.log_file, "log.csv")
 
             # Read and create data base
-            print(self.app_setup.data_base_file)
             builder = BuildDB({"--data_file":self.app_setup.data_base_file})
             self.mongo_db = builder.build()
+
+            # Start thread to update the data base
+            self.update = True
+            self.update_db()
 
             self.log("info","Session started")
             self.log("info","Participant: {}".format(self.app_setup.participant.get()))
@@ -208,6 +221,7 @@ class GUI_kernel:
                 self.root_filter.destroy()       
             if self.root_setup:
                 self.root_setup.destroy()
+            self.update = False
             sys.exit(0)
 
 # Methods associated with GUI_filter
@@ -218,6 +232,9 @@ class GUI_kernel:
         return [shape.lower() for shape in list(self.mongo_db.distinct("#Shape"))]
 
     def update_filter(self, gui):
+        if self.client_tuple:
+            print("==== Update kernel reference ====")
+            self.client_tuple[0].kernel = self
         if len(gui.view_labels) > 0:
             [label.grid_forget() for label in gui.view_labels]
             [chekb.grid_forget() for chekb in gui.view_checks]
@@ -316,8 +333,7 @@ class GUI_kernel:
                 self.root_filter.destroy()
                 self.root_filter = None
                 self.app_filter = None
-
-
+            self.update = False
 
     def start(self):
         # (Re)set the runtime
@@ -414,3 +430,36 @@ class GUI_kernel:
             writer = csv.writer(f, delimiter=':')
             for key, value in config.items():
                 writer.writerow([key, value])
+
+    def update_db(self):
+        """ Reads the messages from the client every update_time and updates the database if a new message has arrived.
+        """
+        update_time = 5.0
+        if self.update:
+            threading.Timer(update_time, self.update_db).start()
+            if not self.mongo_db:
+                return
+            if self.update_queue:
+                while not self.update_queue.empty():
+                    data = self.update_queue.get()
+                    try:
+                        (x_new, y_new, x_pix, y_pix) = data.split(",")
+                    except ValueError:
+                        sys.stderr.write("Unable to update data base: Unknown format. update post: {} \nContinuing\n".format(data))
+                        continue
+                    all_items = list(self.mongo_db.find({}, {"_id": 1, "ID":1, "X":1, "Y":1}))
+                    min_dist = 1000
+                    item_2_update = None
+                    for i, item in enumerate(all_items):
+                        dist = self.euclidian(x_new, y_new, item["X"], item["Y"])
+                        if dist < min_dist:
+                            min_dist = dist
+                            item_2_update = item
+                    if item_2_update:
+                        print("Updated {} with pos({:.02f}, {:.02f}) and pix({}, {})".format(item_2_update["ID"], float(item_2_update["X"]), float(item_2_update["Y"]), "?", "?"))
+                        print("{}           to pos({:.02f}, {:.02f}) and pix({:.02f}, {:.02f})".format(" "*len(item_2_update["ID"]), float(x_new), float(y_new), float(x_pix), float(y_pix)))
+                        post = {"X": x_new, "Y":y_new, "X_pix":x_pix, "Y_pix":y_pix}
+                        self.mongo_db.update_one({'_id':item_2_update['_id']}, {"$set": post}, upsert=False)
+
+    def euclidian(self, x1, y1, x2, y2):
+        return sqrt(pow(float(x1)-float(x2), 2)+pow(float(y1)-float(y2), 2))

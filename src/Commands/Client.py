@@ -24,8 +24,7 @@ class Client(Process):
                  pipe_out,
                  port=5000,
                  host="localhost",
-                 connection_attempts=10,
-                 logger=None):
+                 **kwargs):
         Process.__init__(self)
         self.client_type = client_type
         self.pipe_in = pipe_in
@@ -33,9 +32,20 @@ class Client(Process):
         self.messages = []
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.settimeout(2)
-        self.logger = logger
         self.is_alive = True
 
+        # Optional arguments
+        connection_attempts=10
+        self.logger=None
+        self.work=None
+        if "connection_attempts" in kwargs.keys():
+            connection_attempts = kwargs["connection_attempts"]
+        if "work" in kwargs.keys():
+            self.work = kwargs["work"]
+        if "logger" in kwargs.keys():
+            self.logger = kwargs["logger"]
+        
+        
         if host == "localhost":
             host = self.get_local_ip(platform.system())
 
@@ -46,16 +56,16 @@ class Client(Process):
             attempt += 1
             try:
                 self.server.connect((host, port))
-                if logger:
-                    logger.log("Connected to server at ({}, {})".format(host, port))
+                if self.logger:
+                    self.logger.log("Connected to server at ({}, {})".format(host, port))
                 break
             except:
-                if logger:
-                    logger.log("Unable to connect to server {} at port {}. Trial {}/{}"\
+                if self.logger:
+                    self.logger.log("Unable to connect to server {} at port {}. Trial {}/{}"\
                                .format(host, port, attempt, connection_attempts))
         if attempt >= connection_attempts:
-            if logger:
-                logger.log("Connection failed.")
+            if self.logger:
+                self.logger.log("Connection failed.")
             else:
                 print("Connection failed.")
             os.close(self.pipe_in)
@@ -83,7 +93,11 @@ class Client(Process):
                     if not data:
                         os.write(self.pipe_out, "disconnected".encode(encoding='utf_8'))
                     else:
-                        os.write(self.pipe_out, data)
+                        # A small special fix for the GUI
+                        if self.work:
+                            self.gui_parse(data.decode("utf-8"))
+                        else:
+                            os.write(self.pipe_out, data)
                 # Parent process entered a message
                 else:
                     msg = os.read(self.pipe_in, 1024)
@@ -100,6 +114,13 @@ class Client(Process):
             return ips.split(" ")[0]
         else:
             return socket.gethostbyname(socket.gethostname())
+
+    def gui_parse(self, data):
+        data = data.split(";")
+        if "update" in data[0]:
+            data.pop(0)
+            for update in data:
+                self.work.put(update)
 
     def close(self):
         """ Close the client.
