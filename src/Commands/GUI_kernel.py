@@ -164,14 +164,17 @@ class GUI_kernel:
                                                              self.app_setup.rbType.get())
             folder_name_tmp = folder_name
             nmbr = 1
+            new = True
             while True:
                 if exists(join(self.app_setup.write_to_path, folder_name_tmp)):
                     folder_name_tmp = "{}_{}".format(folder_name, nmbr)
                     nmbr += 1
+                    new = False
                 else:
                     os.makedirs(join(self.app_setup.write_to_path, folder_name_tmp))
                     break
-            
+            if new:
+                self.send("{};greetings".format(self.app_setup.rbType.get()).encode("utf-8"))
             self.log_file = join(self.app_setup.write_to_path, folder_name_tmp)
             self.log_file = join(self.log_file, "log.csv")
 
@@ -205,7 +208,6 @@ class GUI_kernel:
 
     def set_db(self, _):
         self.app_setup.data_base_file = join(self.app_setup.data_base_path, self.app_setup.data_file.get())
-        print("New database:", self.app_setup.data_base_file)
 
     def close_setup(self):
         """ Handels the close operation of the setup window. This halts the execution.
@@ -233,7 +235,6 @@ class GUI_kernel:
 
     def update_filter(self, gui):
         if self.client_tuple:
-            print("==== Update kernel reference ====")
             self.client_tuple[0].kernel = self
         if len(gui.view_labels) > 0:
             [label.grid_forget() for label in gui.view_labels]
@@ -289,9 +290,6 @@ class GUI_kernel:
                 self.app_filter.view_checks[i].grid(row=int(i/items_per_row), column=i%items_per_row)
                 widget.grid(row=int(i/items_per_row), column=i%items_per_row, sticky=S+E, padx=(0, 5), pady=(0, 5))
 
-    def new_experiment(self):
-        print("new_experiment")
-
     def send_pos(self):
         """ Send id and position to the reciever depending on the experiment type
         """
@@ -322,8 +320,6 @@ class GUI_kernel:
             else:
                 os.write(self.client_tuple[2], msg)
 
-
-    
     def close_filter(self):
         """ Handels the close operation of the filter window.
         """
@@ -335,7 +331,7 @@ class GUI_kernel:
                 self.app_filter = None
             self.update = False
 
-    def start(self):
+    def start(self, send=True):
         # (Re)set the runtime
         self.run_time = time.time()
         # (Re)set the filter options
@@ -344,6 +340,8 @@ class GUI_kernel:
         self.id_id = {}        
         self.update_filter(self.app_filter)
         self.log("start", "Start")
+        if send and self.app_filter.start_btn.cget("text") == "Restart":
+            self.send("{};restart".format(self.app_filter.session_type).encode("utf-8"))
         self.app_filter.start_btn["text"] = "Restart"
         self.app_filter.init_lbl.grid_forget()
     
@@ -369,7 +367,7 @@ class GUI_kernel:
                 # Send clear to hololens
                 self.send("{};clear".format(self.app_filter.session_type).encode("utf-8"))
                 self.curr_block = None
-            self.start()
+            self.start(send=False)
 
     def send_point(self):
         """ Send point command to YuMi on the format: yumi;point;x;y where yumi is the address where
@@ -388,8 +386,9 @@ class GUI_kernel:
                 self.curr_block = block
                 self.log("point", "Point at block {d[0]} at ({d[1]}, {d[2]})".format(d=block))
                 # Send point command to YuMi
-                self.send("yumi;pick;{};{}".format(block[1], block[2]).encode("utf-8"))
-                time.sleep(0.5)
+                self.send("yumi;point;{};{}".format(block[1], block[2]).encode("utf-8"))
+                time.sleep(0.1)
+                self.send("{};poit".format(self.app_filter.session_type).encode("utf-8"))
 
     def unselect(self):
         if len(self.filtered_items) > 0:
@@ -397,6 +396,7 @@ class GUI_kernel:
                 self.app_filter.view_ch_val[i].set(False)
 
     def log_no(self):
+        self.send("{};no".format(self.app_filter.session_type).encode("utf-8"))
         if self.curr_block:
             self.log("No", "User said no to block {d[0]} at ({d[1]}, {d[2]})".format(d=self.curr_block))
         else:
