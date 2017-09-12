@@ -367,7 +367,7 @@ class GUI_kernel:
                 self.send("yumi;pick;{};{}".format(block[1], block[2]).encode("utf-8"))
                 time.sleep(0.5)
                 # Send clear to hololens
-                self.send("hololens;clear".encode("utf-8"))
+                self.send("{};clear".format(self.app_filter.session_type).encode("utf-8"))
                 self.curr_block = None
             self.start()
 
