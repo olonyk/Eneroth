@@ -47,7 +47,22 @@ in a new shell, or by connecting a real hololens to the server started above.
 $ python3.5 Eneroth.py GUI -vt
 ```
 4. In the GUI click on "Connect" and click "Launch".
-5. Use the color and shape filters to filter lego parts. Note that the lego parts will show up after a (any) filter is selected.
+5. Use the color and shape filters to filter lego parts.
+6. To update a position in the lego database base send a message of the following format to the server:
+```sh
+kernel;update;x_pos1,y_pos1,x_pix1,y_pix1;x_pos1,y_pos1,x_pix1,y_pix1
+```
+i.e. the name of the reciever, *kernel*, the function, *update*, and one or more tuples of length four with floats, where each tuple is representing a block to be updated. Note that the reciever, function and tuples are separated with semicolons and the tuples are internally separated with commas. The kernel will search for the block in the database with the closest *eucledian* distance from the update coordinates and update its coordinates. For example:
+
+If this is sent to the Server
+```sh
+kernel;update;0.55,0.41,0.54,0.32
+```
+... this could be the output from the kernel:
+```sh
+Updated 4121934 with pos(0.50, 0.40) and pix(?, ?)
+                  to pos(0.55, 0.41) and pix(0.54, 0.32)
+```
 
 ### Dependencies
 1. docopt

@@ -127,7 +127,7 @@ class GUI_kernel:
         pipe_in_client, pipe_out_dia = os.pipe()
         pipe_in_dia, pipe_out_client = os.pipe()
         # Create a client object to communicate with the server
-        client = Client(client_type="GUI client",
+        client = Client(client_type="kernel",
                         port=int(self.app_setup.port.get()),
                         host=self.app_setup.addr.get(),
                         pipe_in=pipe_in_client,
@@ -456,8 +456,8 @@ class GUI_kernel:
                             min_dist = dist
                             item_2_update = item
                     if item_2_update:
-                        print("Updated {} with pos({:.02f}, {:.02f}) and pix({}, {})".format(item_2_update["ID"], float(item_2_update["X"]), float(item_2_update["Y"]), "?", "?"))
-                        print("{}           to pos({:.02f}, {:.02f}) and pix({:.02f}, {:.02f})".format(" "*len(item_2_update["ID"]), float(x_new), float(y_new), float(x_pix), float(y_pix)))
+                        print("Updated block {} with pos({:.02f}, {:.02f}) and pix({}, {})".format(item_2_update["ID"], float(item_2_update["X"]), float(item_2_update["Y"]), "?", "?"))
+                        print("{}                 to pos({:.02f}, {:.02f}) and pix({:.02f}, {:.02f})".format(" "*len(item_2_update["ID"]), float(x_new), float(y_new), float(x_pix), float(y_pix)))
                         post = {"X": x_new, "Y":y_new, "X_pix":x_pix, "Y_pix":y_pix}
                         self.mongo_db.update_one({'_id':item_2_update['_id']}, {"$set": post}, upsert=False)
 
