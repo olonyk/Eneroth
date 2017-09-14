@@ -367,6 +367,7 @@ class GUI_kernel:
                 # Send clear to hololens
                 self.send("{};clear".format(self.app_filter.session_type).encode("utf-8"))
                 self.curr_block = None
+                self.remove(block)
             self.start(send=False)
 
     def send_point(self):
@@ -430,6 +431,21 @@ class GUI_kernel:
             writer = csv.writer(f, delimiter=':')
             for key, value in config.items():
                 writer.writerow([key, value])
+
+    def remove(self, block):
+        self.log("info", "User removed block {} at ({}, {})".format(block[0], block[1], block[2]))
+        self.mongo_db.delete_one({"ID": block[0]})
+        self.update_filter(self.app_filter)
+
+    def find_and_remove(self):
+        if len(self.filtered_items) > 0:
+            block = False
+            for i, item in enumerate(self.filtered_items):
+                if self.app_filter.view_ch_val[i].get():
+                    block = (item["ID"], item["X"], item["Y"])
+                    break
+            if block:
+                self.remove(block)
 
     def update_db(self):
         """ Reads the messages from the client every update_time and updates the database if a new message has arrived.
