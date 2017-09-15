@@ -22,10 +22,10 @@ class Logger():
         """
         if self.do_log or self.do_print:
             time = datetime.now()
-            time_stamp = "{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}\t{}\t".format(time.year, time.month,\
+            time_stamp = "{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}.{:04d}\t{}\t".format(time.year, time.month,\
                                                                             time.day, time.hour, \
                                                                             time.minute, time.second,\
-                                                                            self.name)
+                                                                            time.microsecond, self.name)
             message = "{}\t{}".format(time_stamp, message)
             if self.do_print:
                 print(message)
