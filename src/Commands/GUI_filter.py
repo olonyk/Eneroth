@@ -84,6 +84,8 @@ class GUI_filter(Frame):
         btn.grid(row=2, column=1, padx=(5, 5), sticky=N+W+E)
         btn = Button(btn_frame, text="Remove", command=self.kernel.find_and_remove)
         btn.grid(row=3, column=1, padx=(5, 5), sticky=N+W+E)
+        btn = Button(btn_frame, text="Home", command=self.kernel.go_to_home)
+        btn.grid(row=3, column=0, padx=(5, 5), sticky=N+W+E)
 
         img1 = ImageTk.PhotoImage(PIL.Image.open(resource_filename("Commands.resources.images",
                                                                    "back.png")))

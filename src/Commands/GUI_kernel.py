@@ -418,7 +418,11 @@ class GUI_kernel:
                 writer = csv.writer(log_file, delimiter=';')
                 writer.writerow(msg)
 
-        
+    def go_to_home(self):
+        """ Send the yumi to the home position.
+        """
+        self.log("Info", "Send YuMi to home position.")
+        self.send("yumi;home".encode("utf-8"))
 
     def write_config(self):
         """ Write settings to the configuration file.
