@@ -4,7 +4,7 @@ import sys
 from io import BytesIO
 from os import listdir
 from tkinter import Tk, BOTH
-from tkinter.ttk import Frame, Radiobutton, Label, Scrollbar, Button, OptionMenu, Entry
+from tkinter.ttk import Frame, Radiobutton, Label, Scrollbar, Button, OptionMenu, Entry, Checkbutton
 from tkinter import StringVar, IntVar
 from tkinter import *
 import tkinter as ttk
@@ -86,6 +86,10 @@ class GUI_filter(Frame):
         btn.grid(row=3, column=1, padx=(5, 5), sticky=N+W+E)
         btn = Button(btn_frame, text="Home", command=self.kernel.go_to_home)
         btn.grid(row=3, column=0, padx=(5, 5), sticky=N+W+E)
+
+        self.send = IntVar()
+        self.send.set(1)
+        Checkbutton(btn_frame, text="Send data to server", variable=self.send, bg="white").grid(row=3, column=2, sticky=N+W+E)
 
         img1 = ImageTk.PhotoImage(PIL.Image.open(resource_filename("Commands.resources.images",
                                                                    "back.png")))
