@@ -1,4 +1,4 @@
-server_adrs:192.168.1.3;localhost;192.168.1.2;192.168.1.8
-write_to_path:"C:\code\Eneroth\src\Commands"
 server_ports:5000
+write_to_path:"C:\code\Eneroth\src\Commands"
 data_base_path:"C:/code/Eneroth/src/legoDB/lego"
+server_adrs:192.168.1.3;192.168.1.2;localhost;192.168.1.8

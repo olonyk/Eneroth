@@ -400,7 +400,7 @@ class GUI_kernel:
                 # Send point command to YuMi
                 self.send("yumi;point;{};{}".format(block[1], block[2]).encode("utf-8"))
                 time.sleep(0.1)
-                self.send("{};poit".format(self.app_filter.session_type).encode("utf-8"))
+                self.send("{};point".format(self.app_filter.session_type).encode("utf-8"))
 
     def unselect(self):
         if len(self.filtered_items) > 0:
