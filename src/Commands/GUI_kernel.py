@@ -322,7 +322,10 @@ class GUI_kernel:
             allow non blocking select on the pipe self.pipe_in. Thus we need thist workaround. We
             esentially bypass the client when writing to the server.
         """
-        if self.client_tuple and self.app_filter.send.get():
+        send_bool = True
+        if self.app_filter:
+            send_bool = self.app_filter.send.get()
+        if self.client_tuple and send_bool:
             if platform.system() == "Windows":
                 self.client_tuple[0].server.send(msg)
             else:
