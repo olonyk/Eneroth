@@ -233,7 +233,7 @@ class GUI_kernel:
     def get_shapes(self):
         return [shape.lower() for shape in list(self.mongo_db.distinct("#Shape"))]
 
-    def update_filter(self, gui):
+    def update_filter(self, gui, send_pos=True):
         if self.client_tuple:
             self.client_tuple[0].kernel = self
         if len(gui.view_labels) > 0:
@@ -276,7 +276,8 @@ class GUI_kernel:
                 gui.photos.append(photo)
             self.layout(None)
             self.filtered_items = filtered_items
-            self.send_pos()
+            if send_pos:
+                self.send_pos()
         
         self.log("new filter", "Color: {} Shape: {}".format(gui.color.get(), gui.shape.get()))
 
@@ -338,7 +339,7 @@ class GUI_kernel:
         self.app_filter.color.set("all")
         self.app_filter.shape.set("all")
         self.id_id = {}        
-        self.update_filter(self.app_filter)
+        self.update_filter(self.app_filter, send_pos=False)
         self.log("start", "Start")
         if send and self.app_filter.start_btn.cget("text") == "Restart":
             self.send("{};restart".format(self.app_filter.session_type).encode("utf-8"))
@@ -439,7 +440,7 @@ class GUI_kernel:
     def remove(self, block):
         self.log("info", "User removed block {} at ({}, {})".format(block[0], block[1], block[2]))
         self.mongo_db.delete_one({"ID": block[0]})
-        self.update_filter(self.app_filter)
+        self.update_filter(self.app_filter, send_pos=False)
 
     def find_and_remove(self):
         if len(self.filtered_items) > 0:
