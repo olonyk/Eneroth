@@ -35,7 +35,8 @@ class Server:
         self.connection_dict["server"] = self.server_socket
         self.logger.log("Server started\t addr:\t{}\tport:{} ".format(self.server_socket.getsockname()[0],\
                                                                self.server_socket.getsockname()[1]))
-
+        # Create a backlog of undelivered messages
+        self.backlog = []
 
     def run(self):
         """ The main loop of the server.
@@ -108,7 +109,7 @@ class Server:
         if data[0] == "close me":
             self.remove_socket(sock)
 
-        if data[0] == "client_type":
+        elif data[0] == "client_type":
             self.logger.log("A new client, '{}', has joined with addr {}".format(data[1], \
                      sock.getpeername()))
             # New client
@@ -116,14 +117,24 @@ class Server:
                 if new_socket == sock:
                     self.connection_dict[data[1]] = new_socket
                     self.new_connections.remove(new_socket)
+                    self.send_from_backlog()
                     return
             self.logger.log("Warning! The new client: {} was not found in".format(data[1]) \
                      + " the list of connections")
         else:
             # A message that should be forwarded
+            recipient_found = False
             for client, recipient_socket in self.connection_dict.items():
                 if client == data[0]:
+                    recipient_found = True
                     self.send(recipient_socket, ";".join(data[1:]))
+            if not recipient_found:
+                if not sock:
+                    return
+                self.logger.log("Message added to backlog")
+                self.backlog.append(";".join(data).encode("utf-8"))
+            else:
+                return 1
 
     def send(self, recipient_socket, message):
         """ The send command handles the forwarding of messages to different clients of the system.
@@ -150,3 +161,14 @@ class Server:
         else:
             return socket.gethostbyname(socket.gethostname())
 
+    def send_from_backlog(self):
+        """ Try to resend the messages in backlog.
+        """
+        delete_backlog_posts = []
+        for msg in self.backlog:
+            delete_backlog_posts.append(self.parse(False, msg))
+        for i, delete in reversed(list(enumerate(delete_backlog_posts))):
+            print("{}: {}".format(delete, delete==True))
+            if delete:
+                self.backlog.pop(i)
+        #self.logger.log("Backlog: {}".format(", ".join(self.backlog)))
