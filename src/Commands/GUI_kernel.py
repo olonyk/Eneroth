@@ -43,6 +43,7 @@ class GUI_kernel:
         self.update = False
         self.update_queue = None
         self.id_id = {}
+        self.previous_filter = ("all", "all")
         self.filtered_items = []
         self.curr_block = None
         self.root_setup = Tk()
@@ -245,19 +246,25 @@ class GUI_kernel:
         if gui.color.get() == "all" and gui.shape.get() == "all":
             filtered_items = list(self.mongo_db.find({}, {"<img>": 1, "_id": 0,
                                                           "ID":1, "X":1, "Y":1}))
+            current_filter = ("all", "all")
         elif gui.color.get() == "all":
             filtered_items = list(self.mongo_db.find({"#Shape": gui.shape.get()},
                                                      {"<img>": 1, "_id": 0,
                                                       "ID":1, "X":1, "Y":1}))
+            current_filter = ("all", gui.shape.get())
         elif gui.shape.get() == "all":
             filtered_items = list(self.mongo_db.find({"#Color": gui.color.get()},
                                                      {"<img>": 1, "_id": 0,
                                                       "ID":1, "X":1, "Y":1}))
+            current_filter = (gui.color.get(), "all")
         else:
             filtered_items = list(self.mongo_db.find({"#Color": gui.color.get(),
                                                       "#Shape": gui.shape.get()},
                                                      {"<img>": 1, "_id": 0,
                                                       "ID":1, "X":1, "Y":1}))
+            current_filter = (gui.color.get(), gui.shape.get())
+        self.check_filter_update(current_filter)
+
         gui.photos = []
         if len(filtered_items) > 0:
             image = PIL.Image.open(BytesIO(filtered_items[0]["<img>"]))
@@ -300,7 +307,7 @@ class GUI_kernel:
             for i, item in enumerate(self.filtered_items):
                 if self.app_filter.view_ch_val[i].get():
                     if not item["ID"] in self.id_id.keys():
-                        self.id_id[item["ID"]] = len(self.id_id.keys())
+                        self.id_id[item["ID"]] = len(self.id_id.keys()) + 1
                         self.app_filter.view_labels[i]['text'] = self.id_id[item["ID"]]
                     msg.append("{},{},{}".format(item["ID"],
                                                 item["X"],
@@ -484,3 +491,14 @@ class GUI_kernel:
 
     def euclidian(self, x1, y1, x2, y2):
         return sqrt(pow(float(x1)-float(x2), 2)+pow(float(y1)-float(y2), 2))
+
+    def check_filter_update(self, current_filter):
+        """ Check if a new set of labels chould be created
+        """
+        if current_filter == ("all", "all"):
+            self.id_id = {}
+        elif not self.previous_filter[0] == "all" and not self.previous_filter[0] == current_filter[0]:
+            self.id_id = {}
+        elif not self.previous_filter[1] == "all" and not self.previous_filter[1] == current_filter[1]:
+            self.id_id = {}
+        self.previous_filter = current_filter
