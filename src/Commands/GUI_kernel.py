@@ -32,7 +32,10 @@ from .Logger import Logger
 
 class GUI_kernel:
     def __init__(self, args):
-
+        # Offset the coordinates sent to YuMi
+        self.offset_x = -0.02
+        self.offset_y = -0.01
+        
         self.client_tuple = None
         self.root_setup = None
         self.app_filter = None
@@ -373,7 +376,7 @@ class GUI_kernel:
                 self.log("pick", "Pick block {d[0]} at ({d[1]}, {d[2]})".format(d=block))
                 self.run_time = time.time()
                 # Send pick to YuMi
-                self.send("yumi;pick;{};{}".format(block[1], block[2]).encode("utf-8"))
+                self.send("yumi;pick;{};{}".format(str(float(block[1])+self.offset_x), str(float(block[2])+self.offset_y)).encode("utf-8"))
                 time.sleep(0.5)
                 # Send clear to hololens
                 self.send("{};clear".format(self.app_filter.session_type).encode("utf-8"))
@@ -398,7 +401,7 @@ class GUI_kernel:
                 self.curr_block = block
                 self.log("point", "Point at block {d[0]} at ({d[1]}, {d[2]})".format(d=block))
                 # Send point command to YuMi
-                self.send("yumi;point;{};{}".format(block[1], block[2]).encode("utf-8"))
+                self.send("yumi;point;{};{}".format(str(float(block[1])+self.offset_x), str(float(block[2])+self.offset_y)).encode("utf-8"))
                 time.sleep(0.1)
                 self.send("{};point".format(self.app_filter.session_type).encode("utf-8"))
 
