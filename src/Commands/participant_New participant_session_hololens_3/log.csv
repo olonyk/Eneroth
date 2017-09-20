@@ -1,0 +1,14 @@
+2017;9;15;13;35;19;949114;;info;Session started
+2017;9;15;13;35;19;949336;;info;Participant: New participant
+2017;9;15;13;35;19;949423;;info;Experiment: hololens
+2017;9;15;13;35;19;949487;;info;Data base: /home/fact/yumi_depends_ws/src/Eneroth/src/lego/Lego_DB.csv
+2017;9;15;13;35;19;953174;;info;Data size: 80
+2017;9;15;13;35;19;953263;;info;Server adr: 192.168.1.118
+2017;9;15;13;35;19;953310;;;
+2017;9;15;13;35;20;485019;;new filter;Color: all Shape: all
+2017;9;15;13;35;29;750651;;pick;Pick block 300301 at (0.05, 0.45)
+2017;9;15;13;35;30;251474;0.500670;info;User removed block 300301 at (0.05, 0.45)
+2017;9;15;13;35;30;595342;0.844517;new filter;Color: all Shape: all
+2017;9;15;13;35;31;50250;0.454792;new filter;Color: all Shape: all
+2017;9;15;13;35;31;50493;0.455009;start;Start
+2017;9;15;13;36;6;204302;35.608836;info;session exit
