@@ -35,16 +35,19 @@ class GUI_setup(Frame):
         rb1 = Radiobutton(frame_session_type, text="Hololens", variable=self.rbType, value="hololens", command=self.type)
         rb2 = Radiobutton(frame_session_type, text="Monitor", variable=self.rbType, value="monitor", command=self.type)
         rb3 = Radiobutton(frame_session_type, text="Dialogue", variable=self.rbType, value="dialogue", command=self.type)
+        rb4 = Radiobutton(frame_session_type, text="Projector", variable=self.rbType, value="pojector", command=self.type)
         
         self.rbType.set("hololens")
         rb1.select()
         rb2.deselect()
         rb3.deselect()
+        rb4.deselect()
 
         lbl1.grid(row=0, column=0, sticky=W+N)
         rb1.grid(row=1, column=0, sticky=W+N)
         rb2.grid(row=2, column=0, sticky=W+N)
         rb3.grid(row=3, column=0, sticky=W+N)
+        rb4.grid(row=4, column=0, sticky=W+N)
 
         # Data base
         self.data_base_path = config["data_base_path"]
