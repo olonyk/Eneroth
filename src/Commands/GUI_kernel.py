@@ -463,7 +463,7 @@ class GUI_kernel:
                 self.send("{};remove;{};{}".format(self.app_filter.session_type,
                                                    block[1], block[2]).encode("utf-8"))
                 # Special case if the session type is dialog, we also send point to yumi.
-                if self.app_filter.session_type = "dialogue":
+                if self.app_filter.session_type == "dialogue":
                     self.log("point", "Point at block {d[0]} at ({d[1]}, {d[2]})".format(d=block))
                     self.send("yumi;point;{};{}".format(block[1], block[2]).encode("utf-8"))
                 self.remove(block)
