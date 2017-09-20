@@ -38,6 +38,9 @@ class Server:
         # Create a backlog of undelivered messages
         self.backlog = []
 
+        # Create a list of sockets to ignore
+        self.ignore = []
+
     def run(self):
         """ The main loop of the server.
         """
@@ -47,6 +50,14 @@ class Server:
             read_sockets, _, _ = select.select(all_connections, [], [])
 
             for sock in read_sockets:
+                # Check if we should ignore this connection
+                try:
+                    if sock.getpeername() in self.ignore:
+                        continue
+                except:
+                    pass
+                finally:
+                    pass
                 #New connection
                 if sock == self.server_socket:
                     # Handle the case in which there is a new connection recieved through
@@ -105,6 +116,11 @@ class Server:
             if not ord(char) < 32 or ord(char) > 126:
                 tmp += char
         data = tmp
+        # Try to figure out if the message is from a browser, if so close it
+        if "User-Agent:" in data:
+            print("The socket {} is ignored.".format(sock.getpeername()))
+            self.ignore.append(sock.getpeername())
+            return
         data = data.split(";")
         if data[0] == "close me":
             self.remove_socket(sock)
