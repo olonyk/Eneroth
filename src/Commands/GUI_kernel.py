@@ -463,8 +463,10 @@ class GUI_kernel:
                     block = (item["ID"], item["X"], item["Y"])
                     break
             if block:
-                self.send("{};remove;{};{}".format(self.app_filter.session_type,
-                                                   block[1], block[2]).encode("utf-8"))
+                self.app_filter.send.set(1)
+                self.send("{};remove".format(self.app_filter.session_type).encode("utf-8"))
+                self.send("{};{},{},{}".format(self.app_filter.session_type, block[0],
+                                            block[1], block[2]).encode("utf-8"))
                 # Special case if the session type is dialog, we also send point to yumi.
                 if self.app_filter.session_type == "dialogue":
                     self.log("point", "Point at block {d[0]} at ({d[1]}, {d[2]})".format(d=block))

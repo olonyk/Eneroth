@@ -1,0 +1,10 @@
+2017-09-16 22:52:25		info	Session started
+2017-09-16 22:52:25		info	Participant: New participant
+2017-09-16 22:52:25		info	Experiment: monitor
+2017-09-16 22:52:25		info	Data base: C:/code/Eneroth/src/legoDB/lego\Lego_DB.csv
+2017-09-16 22:52:25		info	Data size: 80
+2017-09-16 22:52:25		info	Server adr: 192.168.1.2
+2017-09-16 22:52:25			
+2017-09-16 22:52:26		new filter	Color: all Shape: all
+2017-09-16 22:52:29		send	monitor;300521,0.15,0.3;300421,0.3,0.35;300121,0.55,0.6;300921,0.8,0.4;6036408,0.75,0.05;306221,0.1,0.5;6056297,0.05,0.1;614321,0.3,0.45;4121934,0.5,0.4;303921,0.5,0.15;4521852,0.55,0.35;306541,0.1,0.45
+2017-09-16 22:52:29		new filter	Color: red Shape: all
