@@ -59,7 +59,8 @@ target/
 
 *.json
 
-*.csv
+#*.csv
+*.dat
 
 *.jpg
 
