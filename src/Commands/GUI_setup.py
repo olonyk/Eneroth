@@ -35,7 +35,7 @@ class GUI_setup(Frame):
         rb1 = Radiobutton(frame_session_type, text="Hololens", variable=self.rbType, value="hololens", command=self.type)
         rb2 = Radiobutton(frame_session_type, text="Monitor", variable=self.rbType, value="monitor", command=self.type)
         rb3 = Radiobutton(frame_session_type, text="Dialogue", variable=self.rbType, value="dialogue", command=self.type)
-        rb4 = Radiobutton(frame_session_type, text="Projector", variable=self.rbType, value="pojector", command=self.type)
+        rb4 = Radiobutton(frame_session_type, text="Projector", variable=self.rbType, value="projector", command=self.type)
         
         self.rbType.set("hololens")
         rb1.select()
