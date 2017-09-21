@@ -1,0 +1,18 @@
+2017;9;21;13;37;46;754023;;info;Session started
+2017;9;21;13;37;46;757054;;info;Participant: New participant
+2017;9;21;13;37;46;760051;;info;Experiment: dialogue
+2017;9;21;13;37;46;763051;;info;Data base: C:/code/Eneroth/src/legoDB/lego\Lego_DB.csv
+2017;9;21;13;37;46;775030;;info;Data size: 80
+2017;9;21;13;37;46;778030;;info;Server adr: 192.168.1.2
+2017;9;21;13;37;46;780530;;;
+2017;9;21;13;37;47;25114;;new filter;Color: all Shape: all
+2017;9;21;13;37;57;268335;;point;Point at block 300301 at (0.05, 0.45)
+2017;9;21;13;37;58;271940;;info;User removed block 300301 at (0.05, 0.45)
+2017;9;21;13;37;58;517406;;new filter;Color: all Shape: all
+2017;9;21;13;39;17;785824;;send;"dialogue;301001,0.55,0.5;300101,0.9,0.35;300901,0.35,0.5;306201,0.2,0.05;614301,0.9,0.05;4547489,0.75,0.6;4500469,0.55,0.55;6029156,0.7,0.4;6099548,0.1,0"
+2017;9;21;13;39;17;795798;;new filter;Color: white Shape: all
+2017;9;21;13;39;22;326827;;send;"dialogue;301001,0.55,0.5"
+2017;9;21;13;39;26;960392;;point;Point at block 301001 at (0.55, 0.5)
+2017;9;21;13;39;27;964198;;info;User removed block 301001 at (0.55, 0.5)
+2017;9;21;13;39;27;994680;;new filter;Color: white Shape: all
+2017;9;21;13;39;32;425391;;info;session exit

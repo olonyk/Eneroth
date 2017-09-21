@@ -1,0 +1,10 @@
+2017;9;20;23;50;7;671785;;info;Session started
+2017;9;20;23;50;7;674787;;info;Participant: New participant
+2017;9;20;23;50;7;677287;;info;Experiment: pojector
+2017;9;20;23;50;7;679787;;info;Data base: C:/code/Eneroth/src/legoDB/lego\Lego_DB_0_update2.csv
+2017;9;20;23;50;7;684787;;info;Data size: 28
+2017;9;20;23;50;7;687787;;info;Server adr: 192.168.1.2
+2017;9;20;23;50;7;690160;;;
+2017;9;20;23;50;7;795917;;new filter;Color: all Shape: all
+2017;9;20;23;50;18;818636;;send;"pojector;300424,0.592,0.2;303924,0.312,0.34"
+2017;9;20;23;50;18;822136;;new filter;Color: yellow Shape: all

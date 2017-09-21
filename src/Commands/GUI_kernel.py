@@ -316,7 +316,7 @@ class GUI_kernel:
                                                 item["X"],
                                                 item["Y"]))
             msg = ";".join(msg)
-            msg = "{};{}".format(self.app_filter.session_type, msg)
+            msg = "{};{};".format(self.app_filter.session_type, msg)
             self.log("send", msg)
             self.send(msg.encode("utf-8"))
 
@@ -465,6 +465,7 @@ class GUI_kernel:
             if block:
                 self.app_filter.send.set(1)
                 self.send("{};remove".format(self.app_filter.session_type).encode("utf-8"))
+                
                 time.sleep(1)
                 self.send("{};{},{},{}".format(self.app_filter.session_type, block[0],
                                             block[1], block[2]).encode("utf-8"))

@@ -1,0 +1,24 @@
+2017;9;20;23;51;52;79781;;info;Session started
+2017;9;20;23;51;52;84284;;info;Participant: New participant
+2017;9;20;23;51;52;87259;;info;Experiment: projector
+2017;9;20;23;51;52;89760;;info;Data base: C:/code/Eneroth/src/legoDB/lego\Lego_DB_0_update2.csv
+2017;9;20;23;51;52;95791;;info;Data size: 28
+2017;9;20;23;51;52;98758;;info;Server adr: 192.168.1.2
+2017;9;20;23;51;52;101259;;;
+2017;9;20;23;51;52;215780;;new filter;Color: all Shape: all
+2017;9;20;23;52;1;587750;;send;"projector;300424,0.592,0.2;303924,0.312,0.34"
+2017;9;20;23;52;1;590748;;new filter;Color: yellow Shape: all
+2017;9;20;23;52;6;11666;;send;"projector;300424,0.592,0.2"
+2017;9;20;23;52;7;261639;;pick;Pick block 300424 at (0.592, 0.2)
+2017;9;20;23;52;7;764669;0.500007;info;User removed block 300424 at (0.592, 0.2)
+2017;9;20;23;52;7;786138;0.521477;new filter;Color: yellow Shape: all
+2017;9;20;23;52;7;870639;0.080002;new filter;Color: all Shape: all
+2017;9;20;23;52;7;874638;0.084001;start;Start
+2017;9;20;23;52;11;41819;3.251182;send;"projector;6004943,0.242,0.14;621523,0.592,0.28;6036851,0.462,0.28;300223,0.652,0.34;300123,0.242,0.34"
+2017;9;20;23;52;11;45319;3.254682;new filter;Color: blue Shape: all
+2017;9;20;23;52;13;738021;5.947383;send;"projector;6004943,0.242,0.14"
+2017;9;20;23;52;16;355731;8.565094;info;User removed block 6004943 at (0.242, 0.14)
+2017;9;20;23;52;16;374231;8.583594;new filter;Color: blue Shape: all
+2017;9;20;23;53;19;645845;71.855207;send;"projector;6036851,0.462,0.28"
+2017;9;20;23;53;23;247202;75.456565;info;User removed block 6036851 at (0.462, 0.28)
+2017;9;20;23;53;23;264172;75.473534;new filter;Color: blue Shape: all
