@@ -467,7 +467,7 @@ class GUI_kernel:
                 self.send("{};remove".format(self.app_filter.session_type).encode("utf-8"))
                 
                 time.sleep(1)
-                self.send("{};{},{},{}".format(self.app_filter.session_type, block[0],
+                self.send("{};{},{},{};".format(self.app_filter.session_type, block[0],
                                             block[1], block[2]).encode("utf-8"))
                 # Special case if the session type is dialog, we also send point to yumi.
                 if self.app_filter.session_type == "dialogue":
