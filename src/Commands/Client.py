@@ -121,6 +121,8 @@ class Client(Process):
             data.pop(0)
             for update in data:
                 self.work.put(update)
+        elif "planningFailed" in data[0]:
+            self.work.put("planningFailed")
 
     def close(self):
         """ Close the client.

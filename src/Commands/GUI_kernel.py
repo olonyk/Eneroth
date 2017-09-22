@@ -487,24 +487,34 @@ class GUI_kernel:
             if self.update_queue:
                 while not self.update_queue.empty():
                     data = self.update_queue.get()
-                    try:
-                        (x_new, y_new, x_pix, y_pix) = data.split(",")
-                    except ValueError:
-                        sys.stderr.write("Unable to update data base: Unknown format. update post: {} \nContinuing\n".format(data))
-                        continue
-                    all_items = list(self.mongo_db.find({}, {"_id": 1, "ID":1, "X":1, "Y":1}))
-                    min_dist = 1000
-                    item_2_update = None
-                    for i, item in enumerate(all_items):
-                        dist = self.euclidian(x_new, y_new, item["X"], item["Y"])
-                        if dist < min_dist:
-                            min_dist = dist
-                            item_2_update = item
-                    if item_2_update:
-                        print("Updated block {} with pos({:.02f}, {:.02f}) and pix({}, {})".format(item_2_update["ID"], float(item_2_update["X"]), float(item_2_update["Y"]), "?", "?"))
-                        print("{}                 to pos({:.02f}, {:.02f}) and pix({:.02f}, {:.02f})".format(" "*len(item_2_update["ID"]), float(x_new), float(y_new), float(x_pix), float(y_pix)))
-                        post = {"X": x_new, "Y":y_new, "X_pix":x_pix, "Y_pix":y_pix}
-                        self.mongo_db.update_one({'_id':item_2_update['_id']}, {"$set": post}, upsert=False)
+                    if "planningFailed" in data:
+                        self.send_planningFailed()
+                    else:
+                        self.do_update(data)
+    def send_planningFailed(self):
+        if self.app_filter:
+            self.send("{};planningFailed".format(self.app_filter).encode("utf-8"))
+            self.log("warn","planningFailed")
+        
+    def do_update(self, data):
+        try:
+            (x_new, y_new, x_pix, y_pix) = data.split(",")
+        except ValueError:
+            sys.stderr.write("Unable to update data base: Unknown format. update post: {} \nContinuing\n".format(data))
+            return
+        all_items = list(self.mongo_db.find({}, {"_id": 1, "ID":1, "X":1, "Y":1}))
+        min_dist = 1000
+        item_2_update = None
+        for i, item in enumerate(all_items):
+            dist = self.euclidian(x_new, y_new, item["X"], item["Y"])
+            if dist < min_dist:
+                min_dist = dist
+                item_2_update = item
+            if item_2_update:
+                print("Updated block {} with pos({:.02f}, {:.02f}) and pix({}, {})".format(item_2_update["ID"], float(item_2_update["X"]), float(item_2_update["Y"]), "?", "?"))
+                print("{}                 to pos({:.02f}, {:.02f}) and pix({:.02f}, {:.02f})".format(" "*len(item_2_update["ID"]), float(x_new), float(y_new), float(x_pix), float(y_pix)))
+                post = {"X": x_new, "Y":y_new, "X_pix":x_pix, "Y_pix":y_pix}
+                self.mongo_db.update_one({'_id':item_2_update['_id']}, {"$set": post}, upsert=False)
 
     def euclidian(self, x1, y1, x2, y2):
         return sqrt(pow(float(x1)-float(x2), 2)+pow(float(y1)-float(y2), 2))
