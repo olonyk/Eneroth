@@ -33,8 +33,8 @@ from .Logger import Logger
 class GUI_kernel:
     def __init__(self, args):
         # Offset the coordinates sent to YuMi
-        self.offset_x = -0.02
-        self.offset_y = -0.01
+        self.offset_x = -0.00
+        self.offset_y = -0.00
         
         self.client_tuple = None
         self.root_setup = None
@@ -376,13 +376,60 @@ class GUI_kernel:
                 self.log("pick", "Pick block {d[0]} at ({d[1]}, {d[2]})".format(d=block))
                 self.run_time = time.time()
                 # Send pick to YuMi
-                self.send("yumi;pick;{};{}".format(str(float(block[1])+self.offset_x), str(float(block[2])+self.offset_y)).encode("utf-8"))
+                self.send("yumi;pick;{};{}".format(str(float(block[1])+self.offset_x), str(float(block[2])+self.offset_y)).encode("utf-8"))                          
                 time.sleep(0.5)
-                # Send clear to hololens
+                # Send pick to condition client
+                self.send("{};pick".format(self.app_filter.session_type).encode("utf-8"))
+                # Send clear to condition client
+                time.sleep(7)
                 self.send("{};clear".format(self.app_filter.session_type).encode("utf-8"))
                 self.curr_block = None
                 self.remove(block)
+
             self.start(send=False)
+
+    def send_clear(self):
+        """ Send clear command to condition clients
+        """
+        if len(self.filtered_items) > 0:
+            block = False
+            for i, item in enumerate(self.filtered_items):
+                if self.app_filter.view_ch_val[i].get():
+                    block = (item["ID"], item["X"], item["Y"])
+                    break
+            if block:
+                self.log("userPick", "User picked block {d[0]} at ({d[1]}, {d[2]})".format(d=block))
+                self.run_time = time.time()
+                # Send clear to condition client
+                self.send("{};clear".format(self.app_filter.session_type).encode("utf-8"))
+                time.sleep(0.5)
+                # Send thanks to condition client
+                self.send("{};thanks".format(self.app_filter.session_type).encode("utf-8"))
+
+    def send_sorryPlanning(self):
+        """ Send sorry command when grasping failed to condition clients
+        """        
+        self.log("warn", "Planning failed. Yumi is sorry.")        
+        self.send("{};sorryPlanning".format(self.app_filter.session_type).encode("utf-8"))
+        time.sleep(0.5)
+        
+    def send_sorryGrasping(self):
+        """ Send sorry command when grasping failed to condition clients
+        """        
+        self.log("warn", "Grasping failed. Yumi is sorry.")        
+        self.send("{};sorryGrasping".format(self.app_filter.session_type).encode("utf-8"))
+        time.sleep(0.5)
+        
+    def send_badRequest(self):
+        """ Send didn't undestand commnad to the condition clients
+        """        
+        self.log("warn", "Bad request")        
+        self.send("{};notUnderstand".format(self.app_filter.session_type).encode("utf-8"))
+        time.sleep(0.5)
+        
+    def send_newRequest(self):        
+        self.log("startRequest", "New request started");
+        self.run_time = time.time()
 
     def send_point(self):
         """ Send point command to YuMi on the format: yumi;point;x;y where yumi is the address where
@@ -402,7 +449,7 @@ class GUI_kernel:
                 self.log("point", "Point at block {d[0]} at ({d[1]}, {d[2]})".format(d=block))
                 # Send point command to YuMi
                 self.send("yumi;point;{};{}".format(str(float(block[1])+self.offset_x), str(float(block[2])+self.offset_y)).encode("utf-8"))
-                time.sleep(0.1)
+                time.sleep(7)
                 self.send("{};point".format(self.app_filter.session_type).encode("utf-8"))
 
     def unselect(self):
@@ -485,18 +532,20 @@ class GUI_kernel:
             if not self.mongo_db:
                 return
             if self.update_queue:
+                update_counter = 0
                 while not self.update_queue.empty():
                     data = self.update_queue.get()
                     if "planningFailed" in data:
                         self.send_planningFailed()
                     else:
-                        self.do_update(data)
+                        update_counter += 1
+                        self.do_update(data, update_counter)
     def send_planningFailed(self):
         if self.app_filter:
-            self.send("{};planningFailed".format(self.app_filter).encode("utf-8"))
+            self.send("{};planningFailed".format(self.app_filter.session_type).encode("utf-8"))
             self.log("warn","planningFailed")
         
-    def do_update(self, data):
+    def do_update(self, data, update_counter):
         try:
             (x_new, y_new, x_pix, y_pix) = data.split(",")
         except ValueError:
@@ -510,11 +559,13 @@ class GUI_kernel:
             if dist < min_dist:
                 min_dist = dist
                 item_2_update = item
-            if item_2_update:
-                print("Updated block {} with pos({:.02f}, {:.02f}) and pix({}, {})".format(item_2_update["ID"], float(item_2_update["X"]), float(item_2_update["Y"]), "?", "?"))
-                print("{}                 to pos({:.02f}, {:.02f}) and pix({:.02f}, {:.02f})".format(" "*len(item_2_update["ID"]), float(x_new), float(y_new), float(x_pix), float(y_pix)))
-                post = {"X": x_new, "Y":y_new, "X_pix":x_pix, "Y_pix":y_pix}
-                self.mongo_db.update_one({'_id':item_2_update['_id']}, {"$set": post}, upsert=False)
+        if item_2_update and min_dist <= 0.02:
+            print("{}: Updated block {} with pos({:.02f}, {:.02f}) and pix({}, {})".format(update_counter, item_2_update["ID"], float(item_2_update["X"]), float(item_2_update["Y"]), "?", "?"))
+            print("{}: {}                 to pos({:.02f}, {:.02f}) and pix({:.02f}, {:.02f})".format(update_counter, " "*len(item_2_update["ID"]), float(x_new), float(y_new), float(x_pix), float(y_pix)))
+            post = {"X": x_new, "Y":y_new, "X_pix":x_pix, "Y_pix":y_pix}
+            self.mongo_db.update_one({'_id':item_2_update['_id']}, {"$set": post}, upsert=False)
+        else:
+            print("{}: Min closest block was {:.02f}cm away, no update".format(update_counter, min_dist*100))
 
     def euclidian(self, x1, y1, x2, y2):
         return sqrt(pow(float(x1)-float(x2), 2)+pow(float(y1)-float(y2), 2))

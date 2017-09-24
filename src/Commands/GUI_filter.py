@@ -86,6 +86,17 @@ class GUI_filter(Frame):
         btn.grid(row=3, column=1, padx=(5, 5), sticky=N+W+E)
         btn = Button(btn_frame, text="Home", command=self.kernel.go_to_home)
         btn.grid(row=3, column=0, padx=(5, 5), sticky=N+W+E)
+        btn = Button(btn_frame, text="Clear", command=self.kernel.send_clear)
+        btn.grid(row=0, column=3, padx=(5, 5), sticky=N+W+E)
+        btn = Button(btn_frame, text="Planning failed", command=self.kernel.send_sorryPlanning)
+        btn.grid(row=1, column=3, padx=(5, 5), sticky=N+W+E)
+        btn = Button(btn_frame, text="Grasping failed", command=self.kernel.send_sorryGrasping)
+        btn.grid(row=2, column=3, padx=(5, 5), sticky=N+W+E)
+        btn = Button(btn_frame, text="Not understand", command=self.kernel.send_badRequest)
+        btn.grid(row=3, column=3, padx=(5, 5), sticky=N+W+E)
+        btn = Button(btn_frame, text="New request", command=self.kernel.send_newRequest)
+        btn.grid(row=2, column=2, padx=(5, 5), sticky=N+W+E)
+        
 
         self.send = IntVar()
         self.send.set(1)
