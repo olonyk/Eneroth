@@ -1,0 +1,11 @@
+2017;9;25;1;19;26;307181;;info;Session started
+2017;9;25;1;19;26;310209;;info;Participant: New participant
+2017;9;25;1;19;26;313682;;info;Experiment: hololens
+2017;9;25;1;19;26;316181;;info;Data base: C:/code/Eneroth/src/legoDB/lego\Lego_DB1_shuffle1.csv
+2017;9;25;1;19;26;322685;;info;Data size: 28
+2017;9;25;1;19;26;325683;;info;Server adr: 192.168.1.118
+2017;9;25;1;19;26;328684;;;
+2017;9;25;1;19;26;463683;;new filter;Color: all Shape: all
+2017;9;25;1;19;28;447811;;send;"hololens;6004943,0.242,0.14;621523,0.592,0.28;6036851,0.462,0.28;300223,0.652,0.34;300123,0.242,0.34;"
+2017;9;25;1;19;28;458810;;new filter;Color: blue Shape: all
+2017;9;25;1;42;43;997416;;info;session exit

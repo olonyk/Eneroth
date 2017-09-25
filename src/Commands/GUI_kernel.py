@@ -313,8 +313,8 @@ class GUI_kernel:
                         self.id_id[item["ID"]] = len(self.id_id.keys()) + 1
                         self.app_filter.view_labels[i]['text'] = self.id_id[item["ID"]]
                     msg.append("{},{},{}".format(item["ID"],
-                                                item["X"],
-                                                item["Y"]))
+                                                item["X"][:5],
+                                                item["Y"][:5]))
             msg = ";".join(msg)
             msg = "{};{};".format(self.app_filter.session_type, msg)
             self.log("send", msg)

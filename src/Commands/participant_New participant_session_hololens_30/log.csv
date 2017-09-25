@@ -1,0 +1,25 @@
+2017;9;22;12;22;34;919561;;info;Session started
+2017;9;22;12;22;34;923062;;info;Participant: New participant
+2017;9;22;12;22;34;926089;;info;Experiment: hololens
+2017;9;22;12;22;34;930560;;info;Data base: C:/code/Eneroth/src/legoDB/lego\Lego_DB1_shuffle1.csv
+2017;9;22;12;22;34;936584;;info;Data size: 28
+2017;9;22;12;22;34;939562;;info;Server adr: 192.168.1.118
+2017;9;22;12;22;34;942062;;;
+2017;9;22;12;22;35;71084;;new filter;Color: all Shape: all
+2017;9;22;12;23;8;112804;;pick;Pick block 300121 at (0.652, 0.14)
+2017;9;22;12;23;8;617238;0.500933;info;User removed block 300121 at (0.652, 0.14)
+2017;9;22;12;23;8;733142;0.616837;new filter;Color: all Shape: all
+2017;9;22;12;23;8;821646;0.085503;new filter;Color: all Shape: all
+2017;9;22;12;23;8;825643;0.089500;start;Start
+2017;9;22;12;24;4;582732;55.846589;pick;Pick block 4216615 at (0.299584537745, 0.19261059165)
+2017;9;22;12;24;5;87207;0.500973;info;User removed block 4216615 at (0.299584537745, 0.19261059165)
+2017;9;22;12;24;5;185621;0.599387;new filter;Color: all Shape: all
+2017;9;22;12;24;5;273619;0.084474;new filter;Color: all Shape: all
+2017;9;22;12;24;5;277120;0.087975;start;Start
+2017;9;22;12;24;57;898618;52.709474;pick;Pick block 306221 at (0.45496353507, 0.14096146822)
+2017;9;22;12;24;58;402207;0.500063;info;User removed block 306221 at (0.45496353507, 0.14096146822)
+2017;9;22;12;24;58;496709;0.594566;new filter;Color: all Shape: all
+2017;9;22;12;24;58;589756;0.090050;new filter;Color: all Shape: all
+2017;9;22;12;24;58;592754;0.093047;start;Start
+2017;9;22;12;26;45;811074;107.311368;point;Point at block 4109674 at (0.522, 0.14)
+2017;9;22;12;40;30;16347;931.516640;info;session exit
