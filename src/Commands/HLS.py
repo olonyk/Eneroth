@@ -184,7 +184,6 @@ class Server:
         for msg in self.backlog:
             delete_backlog_posts.append(self.parse(False, msg))
         for i, delete in reversed(list(enumerate(delete_backlog_posts))):
-            print("{}: {}".format(delete, delete==True))
             if delete:
                 self.backlog.pop(i)
         #self.logger.log("Backlog: {}".format(", ".join(self.backlog)))

@@ -1,0 +1,33 @@
+2017;9;25;3;21;51;1702;;info;Session started
+2017;9;25;3;21;51;6702;;info;Participant: New participant
+2017;9;25;3;21;51;10703;;info;Experiment: monitor
+2017;9;25;3;21;51;13702;;info;Data base: C:/code/Eneroth/src/legoDB/lego\Lego_DB1_shuffle1.csv
+2017;9;25;3;21;51;21202;;info;Data size: 28
+2017;9;25;3;21;51;24702;;info;Server adr: 192.168.1.118
+2017;9;25;3;21;51;27704;;;
+2017;9;25;3;21;51;164703;;new filter;Color: all Shape: all
+2017;9;25;3;21;58;567562;;send;"monitor;4160395,0.592,0.14;4109674,0.522,0.14;6073026,0.652,0.2;4164022,0.462,0.2;621528,0.522,0.28;4165967,0.592,0.34;300328,0.522,0.34;"
+2017;9;25;3;21;58;571563;;new filter;Color: green Shape: all
+2017;9;25;3;22;1;923965;;send;Show labels
+2017;9;25;3;22;4;296348;;send;Hide labels
+2017;9;25;3;22;6;441833;;send;Show labels
+2017;9;25;3;22;7;910408;;send;Hide labels
+2017;9;25;3;22;8;533821;;send;Show labels
+2017;9;25;3;22;9;399978;;send;Hide labels
+2017;9;25;3;22;10;103525;;send;Show labels
+2017;9;25;3;29;0;81217;;send;"monitor;6004943,0.242,0.14;621523,0.592,0.28;6036851,0.462,0.28;300223,0.652,0.34;300123,0.242,0.34;"
+2017;9;25;3;29;0;85218;;new filter;Color: blue Shape: all
+2017;9;25;3;29;3;452078;;send;Show labels
+2017;9;25;3;29;5;98935;;send;Hide labels
+2017;9;25;3;29;6;168082;;send;Show labels
+2017;9;25;3;29;8;318409;;send;"monitor;300424,0.592,0.2;303924,0.312,0.34;"
+2017;9;25;3;29;8;322909;;new filter;Color: yellow Shape: all
+2017;9;25;3;29;10;88742;;send;Show labels
+2017;9;25;3;29;11;535927;;send;Hide labels
+2017;9;25;3;29;12;303427;;send;Show labels
+2017;9;25;3;33;9;736396;;send;"monitor;300424,0.592,0.2;303924,0.312,0.34;"
+2017;9;25;3;33;9;739896;;new filter;Color: yellow Shape: all
+2017;9;25;3;33;12;34233;;send;Show labels
+2017;9;25;3;33;13;844384;;send;Hide labels
+2017;9;25;3;33;14;897011;;send;Show labels
+2017;9;25;3;33;18;377503;;info;session exit

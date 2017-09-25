@@ -413,6 +413,19 @@ class GUI_kernel:
         self.send("{};sorryPlanning".format(self.app_filter.session_type).encode("utf-8"))
         time.sleep(0.5)
         
+    def send_showLabels(self):
+        """ Send show labels to condition clients. Wizards when both shape and color filters are applied
+        """        
+        self.log("send", "Show labels")        
+        self.send("{};showLabels".format(self.app_filter.session_type).encode("utf-8"))
+        time.sleep(0.5)
+    def send_hideLabels(self):
+        """ Send hide labels to condition clients. Wizards when bth shape and color filters are applied
+        """        
+        self.log("send", "Hide labels")        
+        self.send("{};hideLabels".format(self.app_filter.session_type).encode("utf-8"))
+        time.sleep(0.5)
+        
     def send_sorryGrasping(self):
         """ Send sorry command when grasping failed to condition clients
         """        

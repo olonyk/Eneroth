@@ -1,0 +1,19 @@
+2017;9;25;3;33;24;881506;;info;Session started
+2017;9;25;3;33;24;887506;;info;Participant: New participant
+2017;9;25;3;33;24;891506;;info;Experiment: projector
+2017;9;25;3;33;24;895005;;info;Data base: C:/code/Eneroth/src/legoDB/lego\Lego_DB1_shuffle1.csv
+2017;9;25;3;33;24;904010;;info;Data size: 28
+2017;9;25;3;33;24;908507;;info;Server adr: 192.168.1.118
+2017;9;25;3;33;24;912004;;;
+2017;9;25;3;33;25;85507;;new filter;Color: all Shape: all
+2017;9;25;3;33;30;785456;;send;"projector;300121,0.652,0.14;306221,0.462,0.14;300921,0.392,0.14;6056297,0.312,0.14;6036408,0.522,0.2;614321,0.392,0.2;4521852,0.652,0.28;4121934,0.392,0.28;303921,0.462,0.34;"
+2017;9;25;3;33;30;789456;;new filter;Color: red Shape: all
+2017;9;25;3;33;34;153416;;send;Show labels
+2017;9;25;3;33;36;898543;;send;Hide labels
+2017;9;25;3;33;38;356739;;send;Show labels
+2017;9;25;3;33;40;363727;;send;Hide labels
+2017;9;25;3;33;41;438404;;send;Show labels
+2017;9;25;3;33;42;274791;;send;Hide labels
+2017;9;25;3;33;43;334864;;send;Show labels
+2017;9;25;3;33;44;60483;;send;Hide labels
+2017;9;25;3;37;42;215835;;info;session exit
